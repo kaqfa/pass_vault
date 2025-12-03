@@ -1,0 +1,25 @@
+Pass-Man - Verify Your Email Address
+
+Hello {{ user.full_name }},
+
+Welcome to Pass-Man! To complete your account setup and start securing your passwords, please verify your email address.
+
+Verification Link:
+{{ verification_url }}
+
+IMPORTANT: This verification link will expire in {{ expires_hours }} hours for security reasons.
+
+What happens after verification?
+- Your account will be activated
+- You can start creating password groups
+- Begin storing and organizing your passwords securely
+- Invite team members to collaborate
+
+Security Note: If you didn't create an account with Pass-Man, please ignore this email. Your email address will not be used without verification.
+
+Need help? If you have any questions or need assistance, please contact our support team.
+
+---
+This email was sent to {{ user.email }} because you (or someone) created a Pass-Man account with this email address.
+
+© 2025 Pass-Man Enterprise Password Management System. All rights reserved.

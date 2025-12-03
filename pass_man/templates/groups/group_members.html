@@ -1,0 +1,705 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ page_title }} - Pass-Man{% endblock %}
+
+{% block extra_css %}
+<style>
+    .members-container {
+        max-width: 1000px;
+        margin: 0 auto;
+        padding: 2rem;
+    }
+    
+    .members-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 2rem;
+        flex-wrap: wrap;
+        gap: 1rem;
+    }
+    
+    .members-title {
+        font-size: 2rem;
+        font-weight: bold;
+        color: #1f2937;
+        flex: 1;
+    }
+    
+    .btn {
+        padding: 0.75rem 1.5rem;
+        border-radius: 8px;
+        font-weight: 600;
+        text-decoration: none;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        transition: transform 0.2s, box-shadow 0.2s;
+        border: none;
+        cursor: pointer;
+    }
+    
+    .btn:hover {
+        transform: translateY(-1px);
+        text-decoration: none;
+    }
+    
+    .btn-primary {
+        background: linear-gradient(135deg, #3b82f6, #1d4ed8);
+        color: white;
+    }
+    
+    .btn-primary:hover {
+        box-shadow: 0 4px 12px rgba(59, 130, 246, 0.4);
+        color: white;
+    }
+    
+    .btn-secondary {
+        background: #f3f4f6;
+        color: #374151;
+        border: 2px solid #d1d5db;
+    }
+    
+    .btn-secondary:hover {
+        background: #e5e7eb;
+        color: #374151;
+    }
+    
+    .btn-danger {
+        background: linear-gradient(135deg, #ef4444, #dc2626);
+        color: white;
+    }
+    
+    .btn-danger:hover {
+        box-shadow: 0 4px 12px rgba(239, 68, 68, 0.4);
+        color: white;
+    }
+    
+    .btn-small {
+        padding: 0.5rem 0.75rem;
+        font-size: 0.875rem;
+    }
+    
+    .add-member-card {
+        background: white;
+        border-radius: 12px;
+        padding: 2rem;
+        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+        border: 1px solid #e5e7eb;
+        margin-bottom: 2rem;
+    }
+    
+    .card-title {
+        font-size: 1.25rem;
+        font-weight: 600;
+        color: #1f2937;
+        margin-bottom: 1rem;
+    }
+    
+    .add-member-form {
+        display: flex;
+        gap: 1rem;
+        align-items: end;
+        flex-wrap: wrap;
+    }
+    
+    .form-group {
+        flex: 1;
+        min-width: 200px;
+    }
+    
+    .form-label {
+        display: block;
+        margin-bottom: 0.5rem;
+        font-weight: 500;
+        color: #374151;
+        font-size: 0.875rem;
+    }
+    
+    .form-input, .form-select {
+        width: 100%;
+        padding: 0.75rem;
+        border: 2px solid #e5e7eb;
+        border-radius: 8px;
+        font-size: 1rem;
+        transition: border-color 0.2s;
+    }
+    
+    .form-input:focus, .form-select:focus {
+        outline: none;
+        border-color: #3b82f6;
+    }
+    
+    .form-input.error, .form-select.error {
+        border-color: #ef4444;
+    }
+    
+    .form-error {
+        color: #ef4444;
+        font-size: 0.875rem;
+        margin-top: 0.25rem;
+    }
+    
+    .members-list-card {
+        background: white;
+        border-radius: 12px;
+        padding: 2rem;
+        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+        border: 1px solid #e5e7eb;
+    }
+    
+    .member-item {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 1.5rem;
+        background: #f9fafb;
+        border-radius: 8px;
+        margin-bottom: 1rem;
+        border: 1px solid #f3f4f6;
+    }
+    
+    .member-item:last-child {
+        margin-bottom: 0;
+    }
+    
+    .member-info {
+        flex: 1;
+    }
+    
+    .member-name {
+        font-weight: 600;
+        color: #1f2937;
+        margin-bottom: 0.25rem;
+        font-size: 1.125rem;
+    }
+    
+    .member-email {
+        color: #6b7280;
+        font-size: 0.875rem;
+        margin-bottom: 0.5rem;
+    }
+    
+    .member-meta {
+        color: #6b7280;
+        font-size: 0.75rem;
+        display: flex;
+        gap: 1rem;
+        flex-wrap: wrap;
+    }
+    
+    .member-actions {
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+        flex-wrap: wrap;
+    }
+    
+    .role-badge {
+        padding: 0.25rem 0.75rem;
+        border-radius: 12px;
+        font-size: 0.75rem;
+        font-weight: 600;
+        text-transform: uppercase;
+    }
+    
+    .role-owner {
+        background: #fee2e2;
+        color: #dc2626;
+    }
+    
+    .role-admin {
+        background: #fef3c7;
+        color: #d97706;
+    }
+    
+    .role-member {
+        background: #f3f4f6;
+        color: #6b7280;
+    }
+    
+    .role-select {
+        padding: 0.5rem;
+        border: 1px solid #d1d5db;
+        border-radius: 6px;
+        font-size: 0.875rem;
+        background: white;
+    }
+    
+    .empty-members {
+        text-align: center;
+        padding: 3rem;
+        color: #6b7280;
+    }
+    
+    .empty-icon {
+        font-size: 4rem;
+        margin-bottom: 1rem;
+    }
+    
+    .empty-title {
+        font-size: 1.25rem;
+        font-weight: 600;
+        margin-bottom: 0.5rem;
+        color: #374151;
+    }
+    
+    .loading {
+        opacity: 0.6;
+        pointer-events: none;
+    }
+    
+    .success-message {
+        background: #f0fdf4;
+        border: 1px solid #bbf7d0;
+        color: #166534;
+        padding: 0.75rem 1rem;
+        border-radius: 8px;
+        margin-bottom: 1rem;
+        font-size: 0.875rem;
+    }
+    
+    .error-message {
+        background: #fef2f2;
+        border: 1px solid #fecaca;
+        color: #dc2626;
+        padding: 0.75rem 1rem;
+        border-radius: 8px;
+        margin-bottom: 1rem;
+        font-size: 0.875rem;
+    }
+    
+    @media (max-width: 768px) {
+        .members-container {
+            padding: 1rem;
+        }
+        
+        .members-header {
+            flex-direction: column;
+            align-items: stretch;
+        }
+        
+        .add-member-form {
+            flex-direction: column;
+        }
+        
+        .form-group {
+            min-width: auto;
+        }
+        
+        .member-item {
+            flex-direction: column;
+            align-items: stretch;
+            gap: 1rem;
+        }
+        
+        .member-actions {
+            justify-content: center;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="members-container">
+    <!-- Header -->
+    <div class="members-header">
+        <h1 class="members-title">{{ page_title }}</h1>
+        <a href="{% url 'groups:detail' group.id %}" class="btn btn-secondary">
+            ← Back to Group
+        </a>
+    </div>
+    
+    <!-- Add Member Section -->
+    <div class="add-member-card">
+        <h2 class="card-title">Add New Member</h2>
+        
+        <div id="messageContainer"></div>
+        
+        <form id="addMemberForm" class="add-member-form">
+            {% csrf_token %}
+            <div class="form-group">
+                <label for="email" class="form-label">Email Address</label>
+                <input 
+                    type="email" 
+                    id="email" 
+                    name="email" 
+                    class="form-input"
+                    placeholder="user@example.com"
+                    required
+                >
+                <div class="form-error" id="emailError" style="display: none;"></div>
+            </div>
+            
+            <div class="form-group">
+                <label for="role" class="form-label">Role</label>
+                <select id="role" name="role" class="form-select">
+                    {% for value, label in role_choices %}
+                        {% if value != 'owner' %}
+                            <option value="{{ value }}" {% if value == 'member' %}selected{% endif %}>
+                                {{ label }}
+                            </option>
+                        {% endif %}
+                    {% endfor %}
+                </select>
+            </div>
+            
+            <button type="submit" class="btn btn-primary">
+                ➕ Add Member
+            </button>
+        </form>
+    </div>
+    
+    <!-- Members List -->
+    <div class="members-list-card">
+        <h2 class="card-title">Current Members ({{ members|length }})</h2>
+        
+        {% if members %}
+            <div id="membersList">
+                {% for member in members %}
+                    <div class="member-item" data-member-id="{{ member.id }}">
+                        <div class="member-info">
+                            <div class="member-name">
+                                {{ member.user.full_name }}
+                                {% if member.user == group.owner %}
+                                    <span style="color: #dc2626; font-weight: 600;">(Owner)</span>
+                                {% endif %}
+                            </div>
+                            <div class="member-email">{{ member.user.email }}</div>
+                            <div class="member-meta">
+                                <span>Joined: {{ member.joined_at|date:"M d, Y" }}</span>
+                                {% if member.added_by %}
+                                    <span>Added by: {{ member.added_by.full_name }}</span>
+                                {% endif %}
+                            </div>
+                        </div>
+                        
+                        <div class="member-actions">
+                            {% if member.user != group.owner %}
+                                <!-- Role Change -->
+                                <select 
+                                    class="role-select" 
+                                    onchange="changeRole('{{ member.id }}', this.value)"
+                                    data-original-role="{{ member.role }}"
+                                >
+                                    {% for value, label in role_choices %}
+                                        {% if value != 'owner' %}
+                                            <option value="{{ value }}" {% if member.role == value %}selected{% endif %}>
+                                                {{ label }}
+                                            </option>
+                                        {% endif %}
+                                    {% endfor %}
+                                </select>
+                                
+                                <!-- Remove Member -->
+                                <button 
+                                    type="button" 
+                                    class="btn btn-danger btn-small"
+                                    onclick="removeMember('{{ member.id }}', '{{ member.user.full_name }}')"
+                                >
+                                    🗑️ Remove
+                                </button>
+                            {% else %}
+                                <span class="role-badge role-owner">Owner</span>
+                            {% endif %}
+                        </div>
+                    </div>
+                {% endfor %}
+            </div>
+        {% else %}
+            <div class="empty-members">
+                <div class="empty-icon">👥</div>
+                <div class="empty-title">No members yet</div>
+                <p>Add the first member to start collaborating on this group.</p>
+            </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+// Add member functionality
+document.getElementById('addMemberForm').addEventListener('submit', function(e) {
+    e.preventDefault();
+    
+    const form = this;
+    const formData = new FormData(form);
+    const messageContainer = document.getElementById('messageContainer');
+    
+    // Clear previous messages
+    messageContainer.innerHTML = '';
+    
+    // Show loading state
+    form.classList.add('loading');
+    
+    fetch(`/groups/ajax/{{ group.id }}/add-member/`, {
+        method: 'POST',
+        body: formData,
+        headers: {
+            'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value,
+        },
+        credentials: 'same-origin'
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            // Show success message
+            messageContainer.innerHTML = `
+                <div class="success-message">
+                    Member "${data.member.user_name}" added successfully!
+                </div>
+            `;
+            
+            // Add member to list
+            addMemberToList(data.member);
+            
+            // Reset form
+            form.reset();
+            
+            // Update member count
+            updateMemberCount();
+            
+        } else {
+            // Show error message
+            messageContainer.innerHTML = `
+                <div class="error-message">
+                    ${data.error}
+                </div>
+            `;
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        messageContainer.innerHTML = `
+            <div class="error-message">
+                An error occurred while adding the member.
+            </div>
+        `;
+    })
+    .finally(() => {
+        form.classList.remove('loading');
+    });
+});
+
+// Add member to DOM
+function addMemberToList(member) {
+    const membersList = document.getElementById('membersList');
+    
+    // If no members list exists, create it
+    if (!membersList) {
+        const membersCard = document.querySelector('.members-list-card');
+        const emptyState = membersCard.querySelector('.empty-members');
+        if (emptyState) {
+            emptyState.remove();
+        }
+        
+        const newList = document.createElement('div');
+        newList.id = 'membersList';
+        membersCard.appendChild(newList);
+    }
+    
+    const memberHtml = `
+        <div class="member-item" data-member-id="${member.id}">
+            <div class="member-info">
+                <div class="member-name">${member.user_name}</div>
+                <div class="member-email">${member.user_email}</div>
+                <div class="member-meta">
+                    <span>Joined: ${member.joined_at}</span>
+                    <span>Added by: {{ user.full_name }}</span>
+                </div>
+            </div>
+            
+            <div class="member-actions">
+                <select 
+                    class="role-select" 
+                    onchange="changeRole('${member.id}', this.value)"
+                    data-original-role="${member.role}"
+                >
+                    {% for value, label in role_choices %}
+                        {% if value != 'owner' %}
+                            <option value="${value}" ${member.role === value ? 'selected' : ''}>
+                                ${value.charAt(0).toUpperCase() + value.slice(1)}
+                            </option>
+                        {% endif %}
+                    {% endfor %}
+                </select>
+                
+                <button 
+                    type="button" 
+                    class="btn btn-danger btn-small"
+                    onclick="removeMember('${member.id}', '${member.user_name}')"
+                >
+                    🗑️ Remove
+                </button>
+            </div>
+        </div>
+    `;
+    
+    document.getElementById('membersList').insertAdjacentHTML('beforeend', memberHtml);
+}
+
+// Change member role
+function changeRole(memberId, newRole) {
+    const selectElement = document.querySelector(`[data-member-id="${memberId}"] .role-select`);
+    const originalRole = selectElement.dataset.originalRole;
+    
+    if (newRole === originalRole) {
+        return; // No change
+    }
+    
+    // Show loading state
+    selectElement.disabled = true;
+    
+    fetch(`/groups/ajax/{{ group.id }}/change-role/${memberId}/`, {
+        method: 'POST',
+        headers: {
+            'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value,
+            'Content-Type': 'application/x-www-form-urlencoded',
+        },
+        body: `role=${newRole}`,
+        credentials: 'same-origin'
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            // Update original role
+            selectElement.dataset.originalRole = newRole;
+            
+            // Show success message
+            const messageContainer = document.getElementById('messageContainer');
+            messageContainer.innerHTML = `
+                <div class="success-message">
+                    Member role updated successfully!
+                </div>
+            `;
+            
+            // Clear message after 3 seconds
+            setTimeout(() => {
+                messageContainer.innerHTML = '';
+            }, 3000);
+            
+        } else {
+            // Revert selection
+            selectElement.value = originalRole;
+            
+            // Show error message
+            const messageContainer = document.getElementById('messageContainer');
+            messageContainer.innerHTML = `
+                <div class="error-message">
+                    ${data.error}
+                </div>
+            `;
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        // Revert selection
+        selectElement.value = originalRole;
+        
+        const messageContainer = document.getElementById('messageContainer');
+        messageContainer.innerHTML = `
+            <div class="error-message">
+                An error occurred while changing the role.
+            </div>
+        `;
+    })
+    .finally(() => {
+        selectElement.disabled = false;
+    });
+}
+
+// Remove member
+function removeMember(memberId, memberName) {
+    if (!confirm(`Are you sure you want to remove "${memberName}" from this group?`)) {
+        return;
+    }
+    
+    const memberElement = document.querySelector(`[data-member-id="${memberId}"]`);
+    memberElement.style.opacity = '0.5';
+    
+    fetch(`/groups/ajax/{{ group.id }}/remove-member/${memberId}/`, {
+        method: 'POST',
+        headers: {
+            'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value,
+        },
+        credentials: 'same-origin'
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            // Remove from DOM
+            memberElement.remove();
+            
+            // Update member count
+            updateMemberCount();
+            
+            // Show success message
+            const messageContainer = document.getElementById('messageContainer');
+            messageContainer.innerHTML = `
+                <div class="success-message">
+                    Member "${memberName}" removed successfully!
+                </div>
+            `;
+            
+            // Check if no members left
+            const membersList = document.getElementById('membersList');
+            if (membersList && membersList.children.length === 0) {
+                membersList.remove();
+                
+                const membersCard = document.querySelector('.members-list-card');
+                membersCard.innerHTML += `
+                    <div class="empty-members">
+                        <div class="empty-icon">👥</div>
+                        <div class="empty-title">No members yet</div>
+                        <p>Add the first member to start collaborating on this group.</p>
+                    </div>
+                `;
+            }
+            
+        } else {
+            // Restore opacity
+            memberElement.style.opacity = '1';
+            
+            // Show error message
+            const messageContainer = document.getElementById('messageContainer');
+            messageContainer.innerHTML = `
+                <div class="error-message">
+                    ${data.error}
+                </div>
+            `;
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        // Restore opacity
+        memberElement.style.opacity = '1';
+        
+        const messageContainer = document.getElementById('messageContainer');
+        messageContainer.innerHTML = `
+            <div class="error-message">
+                An error occurred while removing the member.
+            </div>
+        `;
+    });
+}
+
+// Update member count in title
+function updateMemberCount() {
+    const membersList = document.getElementById('membersList');
+    const count = membersList ? membersList.children.length : 0;
+    const title = document.querySelector('.members-list-card .card-title');
+    title.textContent = `Current Members (${count})`;
+}
+
+// Clear messages after 5 seconds
+setInterval(() => {
+    const messageContainer = document.getElementById('messageContainer');
+    if (messageContainer.innerHTML) {
+        setTimeout(() => {
+            messageContainer.innerHTML = '';
+        }, 5000);
+    }
+}, 1000);
+</script>
+{% endblock %}

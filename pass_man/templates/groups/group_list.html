@@ -1,0 +1,210 @@
+{% extends 'base.html' %}
+{% load group_tags %}
+
+{% block title %}{{ page_title }} - Pass-Man{% endblock %}
+
+{% block content %}
+<div class="space-y-6">
+    <!-- Header -->
+    <div class="sm:flex sm:items-center sm:justify-between">
+        <div>
+            <h1 class="text-2xl font-bold leading-7 text-gray-900 sm:truncate sm:text-3xl sm:tracking-tight">{{ page_title }}</h1>
+            <p class="mt-2 text-sm text-gray-500">Manage your password groups and collaborate with your team.</p>
+        </div>
+        <div class="mt-4 sm:ml-4 sm:mt-0 sm:flex-none">
+            <a href="{% url 'groups:create' %}" class="btn-primary">
+                <svg class="-ml-0.5 mr-1.5 h-5 w-5" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+                    <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.857-9.809a.75.75 0 00-1.214-.882l-3.483 4.79-1.88-1.88a.75.75 0 10-1.06 1.061l2.5 2.5a.75.75 0 001.137-.089l4-5.5z" clip-rule="evenodd" />
+                </svg>
+                Create New Group
+            </a>
+        </div>
+    </div>
+
+    <!-- Search and Filters -->
+    <div class="bg-white shadow rounded-lg p-6">
+        <form method="get" id="searchForm" class="grid grid-cols-1 gap-y-6 gap-x-4 sm:grid-cols-6">
+            <div class="sm:col-span-4">
+                <label for="q" class="form-label">Search</label>
+                <div class="relative mt-1 rounded-md shadow-sm">
+                    <div class="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3">
+                        <svg class="h-5 w-5 text-gray-400" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+                            <path fill-rule="evenodd" d="M9 3.5a5.5 5.5 0 100 11 5.5 5.5 0 000-11zM2 9a7 7 0 1112.452 4.391l3.328 3.329a.75.75 0 11-1.06 1.06l-3.329-3.328A7 7 0 012 9z" clip-rule="evenodd" />
+                        </svg>
+                    </div>
+                    <input type="text" name="q" id="q" class="form-input pl-10" placeholder="Search groups..." value="{{ search_query }}">
+                </div>
+            </div>
+
+            <div class="sm:col-span-2">
+                <label for="role" class="form-label">My Role</label>
+                <select id="role" name="role" class="form-input" onchange="this.form.submit()">
+                    <option value="">All Roles</option>
+                    <option value="owner" {% if current_filters.role == "owner" %}selected{% endif %}>Owner</option>
+                    {% for value, label in role_choices %}
+                        <option value="{{ value }}" {% if current_filters.role == value %}selected{% endif %}>{{ label }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+        </form>
+    </div>
+
+    <!-- Results Info -->
+    {% if total_count > 0 %}
+        <div class="text-sm text-gray-500 text-center">
+            Showing {{ groups|length }} of {{ total_count }} group{{ total_count|pluralize }}
+            {% if search_query %}for "{{ search_query }}"{% endif %}
+        </div>
+    {% endif %}
+
+    <!-- Group Grid -->
+    {% if groups %}
+        <div class="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
+            {% for group in groups %}
+                <div class="bg-white overflow-hidden shadow rounded-lg hover:shadow-md transition-shadow duration-200 border border-gray-200">
+                    <div class="p-5">
+                        <div class="flex items-center justify-between mb-4">
+                            <div class="flex-1 min-w-0">
+                                <h3 class="text-lg font-medium leading-6 text-gray-900 truncate">
+                                    <a href="{% url 'groups:detail' group.id %}" class="hover:text-primary-600">
+                                        {{ group.name }}
+                                    </a>
+                                </h3>
+                                <p class="text-sm text-gray-500 truncate">
+                                    {% if group.owner == user %}
+                                        Owned by you
+                                    {% else %}
+                                        Owned by {{ group.owner.full_name }}
+                                    {% endif %}
+                                </p>
+                            </div>
+                            <div class="ml-4 flex-shrink-0">
+                                {% if group.is_personal %}
+                                    <span class="inline-flex items-center rounded-full bg-yellow-100 px-2.5 py-0.5 text-xs font-medium text-yellow-800">Personal</span>
+                                {% else %}
+                                    <span class="inline-flex items-center rounded-full bg-blue-100 px-2.5 py-0.5 text-xs font-medium text-blue-800">Shared</span>
+                                {% endif %}
+                            </div>
+                        </div>
+
+                        {% if group.description %}
+                            <p class="text-sm text-gray-500 line-clamp-2 mb-4 h-10">{{ group.description }}</p>
+                        {% else %}
+                            <p class="text-sm text-gray-400 italic mb-4 h-10">No description provided.</p>
+                        {% endif %}
+
+                        <div class="flex items-center justify-between pt-4 border-t border-gray-100">
+                            <!-- Role Badge -->
+                            {% with role=group|get_user_role:user %}
+                                {% if role %}
+                                    <span class="inline-flex items-center rounded-md px-2 py-1 text-xs font-medium ring-1 ring-inset 
+                                        {% if role == 'owner' %}bg-red-50 text-red-700 ring-red-600/10
+                                        {% elif role == 'admin' %}bg-yellow-50 text-yellow-800 ring-yellow-600/20
+                                        {% else %}bg-gray-50 text-gray-600 ring-gray-500/10{% endif %}">
+                                        {{ role|capfirst }}
+                                    </span>
+                                {% else %}
+                                    <span></span>
+                                {% endif %}
+                            {% endwith %}
+
+                            <!-- Stats -->
+                            <div class="flex space-x-4 text-sm text-gray-500">
+                                <div class="flex items-center" title="Members">
+                                    <svg class="mr-1.5 h-4 w-4 text-gray-400" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" d="M15 19.128a9.38 9.38 0 002.625.372 9.337 9.337 0 004.121-.952 4.125 4.125 0 00-7.533-2.493M15 19.128v-.003c0-1.113-.285-2.16-.786-3.07M15 19.128v.106A12.318 12.318 0 018.624 21c-2.331 0-4.512-.645-6.374-1.766l-.001-.109a6.375 6.375 0 0111.964-3.07M12 6.375a3.375 3.375 0 11-6.75 0 3.375 3.375 0 016.75 0zm8.25 2.25a2.625 2.625 0 11-5.25 0 2.625 2.625 0 015.25 0z" />
+                                    </svg>
+                                    {{ group.get_member_count }}
+                                </div>
+                                <div class="flex items-center" title="Passwords">
+                                    <svg class="mr-1.5 h-4 w-4 text-gray-400" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" d="M16.5 10.5V6.75a4.5 4.5 0 10-9 0v3.75m-.75 11.25h10.5a2.25 2.25 0 002.25-2.25v-6.75a2.25 2.25 0 00-2.25-2.25H6.75a2.25 2.25 0 00-2.25 2.25v6.75a2.25 2.25 0 002.25 2.25z" />
+                                    </svg>
+                                    {{ group.get_password_count }}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+
+        <!-- Pagination -->
+        {% if groups.has_other_pages %}
+            <div class="flex items-center justify-center border-t border-gray-200 bg-white px-4 py-3 sm:px-6 mt-6 rounded-lg shadow">
+                <div class="flex flex-1 justify-between sm:hidden">
+                    {% if groups.has_previous %}
+                        <a href="?{% if search_query %}q={{ search_query }}&{% endif %}{% if current_filters.role %}role={{ current_filters.role }}&{% endif %}page={{ groups.previous_page_number }}" class="relative inline-flex items-center rounded-md border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50">Previous</a>
+                    {% endif %}
+                    {% if groups.has_next %}
+                        <a href="?{% if search_query %}q={{ search_query }}&{% endif %}{% if current_filters.role %}role={{ current_filters.role }}&{% endif %}page={{ groups.next_page_number }}" class="relative ml-3 inline-flex items-center rounded-md border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50">Next</a>
+                    {% endif %}
+                </div>
+                <div class="hidden sm:flex sm:flex-1 sm:items-center sm:justify-center">
+                    <div>
+                        <nav class="isolate inline-flex -space-x-px rounded-md shadow-sm" aria-label="Pagination">
+                            {% if groups.has_previous %}
+                                <a href="?{% if search_query %}q={{ search_query }}&{% endif %}{% if current_filters.role %}role={{ current_filters.role }}&{% endif %}page={{ groups.previous_page_number }}" class="relative inline-flex items-center rounded-l-md px-2 py-2 text-gray-400 ring-1 ring-inset ring-gray-300 hover:bg-gray-50 focus:z-20 focus:outline-offset-0">
+                                    <span class="sr-only">Previous</span>
+                                    <svg class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+                                        <path fill-rule="evenodd" d="M12.79 5.23a.75.75 0 01-.02 1.06L8.832 10l3.938 3.71a.75.75 0 11-1.04 1.08l-4.5-4.25a.75.75 0 010-1.08l4.5-4.25a.75.75 0 011.06.02z" clip-rule="evenodd" />
+                                    </svg>
+                                </a>
+                            {% endif %}
+                            
+                            {% for num in groups.paginator.page_range %}
+                                {% if groups.number == num %}
+                                    <span class="relative z-10 inline-flex items-center bg-primary-600 px-4 py-2 text-sm font-semibold text-white focus:z-20 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary-600">{{ num }}</span>
+                                {% elif num > groups.number|add:'-3' and num < groups.number|add:'3' %}
+                                    <a href="?{% if search_query %}q={{ search_query }}&{% endif %}{% if current_filters.role %}role={{ current_filters.role }}&{% endif %}page={{ num }}" class="relative inline-flex items-center px-4 py-2 text-sm font-semibold text-gray-900 ring-1 ring-inset ring-gray-300 hover:bg-gray-50 focus:z-20 focus:outline-offset-0">{{ num }}</a>
+                                {% endif %}
+                            {% endfor %}
+
+                            {% if groups.has_next %}
+                                <a href="?{% if search_query %}q={{ search_query }}&{% endif %}{% if current_filters.role %}role={{ current_filters.role }}&{% endif %}page={{ groups.next_page_number }}" class="relative inline-flex items-center rounded-r-md px-2 py-2 text-gray-400 ring-1 ring-inset ring-gray-300 hover:bg-gray-50 focus:z-20 focus:outline-offset-0">
+                                    <span class="sr-only">Next</span>
+                                    <svg class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+                                        <path fill-rule="evenodd" d="M7.21 14.77a.75.75 0 01.02-1.06L11.168 10 7.23 6.29a.75.75 0 111.04-1.08l4.5 4.25a.75.75 0 010 1.08l-4.5 4.25a.75.75 0 01-1.06-.02z" clip-rule="evenodd" />
+                                    </svg>
+                                </a>
+                            {% endif %}
+                        </nav>
+                    </div>
+                </div>
+            </div>
+        {% endif %}
+
+    {% else %}
+        <!-- Empty State -->
+        <div class="text-center bg-white rounded-lg shadow px-6 py-12">
+            <svg class="mx-auto h-12 w-12 text-gray-400" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" aria-hidden="true">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M18 18.72a9.094 9.094 0 003.741-.479 3 3 0 00-4.682-2.72m.94 3.198l.001.031c0 .225-.012.447-.037.666A11.944 11.944 0 0112 21c-2.17 0-4.207-.576-5.963-1.584A6.062 6.062 0 016 18.719m12 0a5.971 5.971 0 00-.941-3.197m0 0A5.995 5.995 0 0012 12.75a5.995 5.995 0 00-5.058 2.772m0 0a3 3 0 00-4.681 2.72 8.986 8.986 0 003.74.477m.94-3.197a5.971 5.971 0 00-.94 3.197M15 6.75a3 3 0 11-6 0 3 3 0 016 0zm6 3a2.25 2.25 0 11-4.5 0 2.25 2.25 0 014.5 0zm-13.5 0a2.25 2.25 0 11-4.5 0 2.25 2.25 0 014.5 0z" />
+            </svg>
+            <h3 class="mt-2 text-sm font-semibold text-gray-900">
+                {% if search_query or current_filters.role %}
+                    No groups found
+                {% else %}
+                    No groups yet
+                {% endif %}
+            </h3>
+            <p class="mt-1 text-sm text-gray-500">
+                {% if search_query or current_filters.role %}
+                    Try adjusting your search criteria or filters.
+                {% else %}
+                    Get started by creating a new group to organize your passwords.
+                {% endif %}
+            </p>
+            {% if not search_query and not current_filters.role %}
+                <div class="mt-6">
+                    <a href="{% url 'groups:create' %}" class="btn-primary">
+                        <svg class="-ml-0.5 mr-1.5 h-5 w-5" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+                            <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.857-9.809a.75.75 0 00-1.214-.882l-3.483 4.79-1.88-1.88a.75.75 0 10-1.06 1.061l2.5 2.5a.75.75 0 001.137-.089l4-5.5z" clip-rule="evenodd" />
+                        </svg>
+                        Create New Group
+                    </a>
+                </div>
+            {% endif %}
+        </div>
+    {% endif %}
+</div>
+{% endblock %}

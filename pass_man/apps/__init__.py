@@ -1,0 +1,1 @@
+# Apps package for Pass-Man Django applications

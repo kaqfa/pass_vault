@@ -1,0 +1,347 @@
+{% extends 'base.html' %}
+
+{% block title %}Create Account - Pass-Man{% endblock %}
+
+{% block extra_css %}
+<style>
+    .auth-container {
+        min-height: 80vh;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+    }
+    
+    .auth-card {
+        background: white;
+        border-radius: 12px;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+        padding: 2rem;
+        width: 100%;
+        max-width: 450px;
+    }
+    
+    .auth-header {
+        text-align: center;
+        margin-bottom: 2rem;
+    }
+    
+    .auth-logo {
+        font-size: 2.5rem;
+        margin-bottom: 0.5rem;
+    }
+    
+    .form-group {
+        margin-bottom: 1.5rem;
+    }
+    
+    .form-label {
+        display: block;
+        margin-bottom: 0.5rem;
+        font-weight: 500;
+        color: #374151;
+    }
+    
+    .form-input {
+        width: 100%;
+        padding: 0.75rem 1rem;
+        border: 2px solid #e5e7eb;
+        border-radius: 8px;
+        font-size: 1rem;
+        transition: border-color 0.2s, box-shadow 0.2s;
+    }
+    
+    .form-input:focus {
+        outline: none;
+        border-color: #3b82f6;
+        box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+    }
+    
+    .form-input.error {
+        border-color: #ef4444;
+    }
+    
+    .form-error {
+        color: #ef4444;
+        font-size: 0.875rem;
+        margin-top: 0.25rem;
+    }
+    
+    .btn-primary {
+        width: 100%;
+        background: linear-gradient(135deg, #3b82f6, #1d4ed8);
+        color: white;
+        border: none;
+        padding: 0.875rem 1.5rem;
+        border-radius: 8px;
+        font-size: 1rem;
+        font-weight: 600;
+        cursor: pointer;
+        transition: transform 0.2s, box-shadow 0.2s;
+    }
+    
+    .btn-primary:hover {
+        transform: translateY(-1px);
+        box-shadow: 0 4px 12px rgba(59, 130, 246, 0.4);
+    }
+    
+    .btn-primary:disabled {
+        opacity: 0.6;
+        cursor: not-allowed;
+        transform: none;
+    }
+    
+    .auth-footer {
+        text-align: center;
+        margin-top: 2rem;
+        padding-top: 2rem;
+        border-top: 1px solid #e5e7eb;
+    }
+    
+    .password-strength {
+        margin-top: 0.5rem;
+    }
+    
+    .strength-bar {
+        height: 4px;
+        background: #e5e7eb;
+        border-radius: 2px;
+        overflow: hidden;
+        margin-bottom: 0.5rem;
+    }
+    
+    .strength-fill {
+        height: 100%;
+        transition: width 0.3s, background-color 0.3s;
+        width: 0%;
+        background: #ef4444;
+    }
+    
+    .strength-text {
+        font-size: 0.875rem;
+        color: #6b7280;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="auth-container">
+    <div class="auth-card">
+        <div class="auth-header">
+            <div class="auth-logo">🔐</div>
+            <h1 class="text-2xl font-bold text-gray-900 mb-2">Create Your Account</h1>
+            <p class="text-gray-600">Join Pass-Man and secure your passwords</p>
+        </div>
+        
+        <form method="post" id="registerForm">
+            {% csrf_token %}
+            
+            <!-- Full Name Field -->
+            <div class="form-group">
+                <label for="full_name" class="form-label">Full Name</label>
+                <input 
+                    type="text" 
+                    id="full_name" 
+                    name="full_name" 
+                    class="form-input {% if errors.full_name %}error{% endif %}"
+                    value="{{ form_data.full_name|default:'' }}"
+                    placeholder="Enter your full name"
+                    required
+                >
+                {% if errors.full_name %}
+                    <div class="form-error">{{ errors.full_name }}</div>
+                {% endif %}
+            </div>
+            
+            <!-- Email Field -->
+            <div class="form-group">
+                <label for="email" class="form-label">Email Address</label>
+                <input 
+                    type="email" 
+                    id="email" 
+                    name="email" 
+                    class="form-input {% if errors.email %}error{% endif %}"
+                    value="{{ form_data.email|default:'' }}"
+                    placeholder="Enter your email address"
+                    required
+                >
+                {% if errors.email %}
+                    <div class="form-error">{{ errors.email }}</div>
+                {% endif %}
+            </div>
+            
+            <!-- Password Field -->
+            <div class="form-group">
+                <label for="password" class="form-label">Password</label>
+                <input 
+                    type="password" 
+                    id="password" 
+                    name="password" 
+                    class="form-input {% if errors.password %}error{% endif %}"
+                    placeholder="Create a strong password"
+                    required
+                >
+                <div class="password-strength">
+                    <div class="strength-bar">
+                        <div class="strength-fill" id="strengthFill"></div>
+                    </div>
+                    <div class="strength-text" id="strengthText">Password strength will appear here</div>
+                </div>
+                {% if errors.password %}
+                    <div class="form-error">
+                        {% if errors.password|length > 1 %}
+                            <ul class="list-disc list-inside">
+                                {% for error in errors.password %}
+                                    <li>{{ error }}</li>
+                                {% endfor %}
+                            </ul>
+                        {% else %}
+                            {{ errors.password.0 }}
+                        {% endif %}
+                    </div>
+                {% endif %}
+            </div>
+            
+            <!-- Confirm Password Field -->
+            <div class="form-group">
+                <label for="confirm_password" class="form-label">Confirm Password</label>
+                <input 
+                    type="password" 
+                    id="confirm_password" 
+                    name="confirm_password" 
+                    class="form-input {% if errors.confirm_password %}error{% endif %}"
+                    placeholder="Confirm your password"
+                    required
+                >
+                {% if errors.confirm_password %}
+                    <div class="form-error">{{ errors.confirm_password }}</div>
+                {% endif %}
+            </div>
+            
+            <!-- Submit Button -->
+            <button type="submit" class="btn-primary" id="submitBtn">
+                <span id="submitText">Create Account</span>
+                <span id="submitSpinner" class="hidden">Creating Account...</span>
+            </button>
+        </form>
+        
+        {% if show_login_link %}
+        <div class="auth-footer">
+            <p class="text-gray-600">
+                Already have an account? 
+                <a href="{% url 'users:login' %}" class="text-blue-600 hover:text-blue-800 font-medium">
+                    Sign in here
+                </a>
+            </p>
+        </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const passwordInput = document.getElementById('password');
+    const confirmPasswordInput = document.getElementById('confirm_password');
+    const strengthFill = document.getElementById('strengthFill');
+    const strengthText = document.getElementById('strengthText');
+    const form = document.getElementById('registerForm');
+    const submitBtn = document.getElementById('submitBtn');
+    const submitText = document.getElementById('submitText');
+    const submitSpinner = document.getElementById('submitSpinner');
+    
+    // Password strength checker
+    function checkPasswordStrength(password) {
+        let score = 0;
+        let feedback = [];
+        
+        if (password.length >= 8) score += 25;
+        else feedback.push('At least 8 characters');
+        
+        if (/[a-z]/.test(password)) score += 25;
+        else feedback.push('Lowercase letter');
+        
+        if (/[A-Z]/.test(password)) score += 25;
+        else feedback.push('Uppercase letter');
+        
+        if (/\d/.test(password)) score += 25;
+        else feedback.push('Number');
+        
+        if (/[!@#$%^&*(),.?":{}|<>]/.test(password)) score += 25;
+        else feedback.push('Special character');
+        
+        // Bonus for length
+        if (password.length >= 12) score += 10;
+        if (password.length >= 16) score += 10;
+        
+        // Penalty for common patterns
+        if (/(.)\1{2,}/.test(password)) score -= 15;
+        if (/(012|123|234|345|456|567|678|789|890)/.test(password)) score -= 15;
+        
+        score = Math.max(0, Math.min(100, score));
+        
+        let strength = 'Very Weak';
+        let color = '#ef4444';
+        
+        if (score >= 80) {
+            strength = 'Very Strong';
+            color = '#10b981';
+        } else if (score >= 60) {
+            strength = 'Strong';
+            color = '#3b82f6';
+        } else if (score >= 40) {
+            strength = 'Medium';
+            color = '#f59e0b';
+        } else if (score >= 20) {
+            strength = 'Weak';
+            color = '#ef4444';
+        }
+        
+        return { score, strength, color, feedback };
+    }
+    
+    passwordInput.addEventListener('input', function() {
+        const password = this.value;
+        
+        if (password.length === 0) {
+            strengthFill.style.width = '0%';
+            strengthText.textContent = 'Password strength will appear here';
+            return;
+        }
+        
+        const result = checkPasswordStrength(password);
+        
+        strengthFill.style.width = result.score + '%';
+        strengthFill.style.backgroundColor = result.color;
+        
+        if (result.feedback.length > 0) {
+            strengthText.textContent = `${result.strength} - Add: ${result.feedback.join(', ')}`;
+        } else {
+            strengthText.textContent = `${result.strength} password`;
+        }
+        
+        strengthText.style.color = result.color;
+    });
+    
+    // Password confirmation checker
+    confirmPasswordInput.addEventListener('input', function() {
+        const password = passwordInput.value;
+        const confirmPassword = this.value;
+        
+        if (confirmPassword && password !== confirmPassword) {
+            this.classList.add('error');
+        } else {
+            this.classList.remove('error');
+        }
+    });
+    
+    // Form submission
+    form.addEventListener('submit', function(e) {
+        submitBtn.disabled = true;
+        submitText.classList.add('hidden');
+        submitSpinner.classList.remove('hidden');
+    });
+});
+</script>
+{% endblock %}
