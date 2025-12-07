@@ -26,11 +26,4 @@ urlpatterns = [
     path('ajax/<uuid:password_id>/reveal/', views.ajax_reveal_password, name='ajax_reveal'),
     path('ajax/<uuid:password_id>/favorite/', views.ajax_toggle_favorite, name='ajax_favorite'),
     path('ajax/generate/', views.ajax_generate_password, name='ajax_generate'),
-    
-    # API Views
-    path('api/', views.api_password_list, name='api_list'),
-    path('api/create/', views.api_password_create, name='api_create'),
-    path('api/<uuid:password_id>/', views.api_password_detail, name='api_detail'),
-    path('api/<uuid:password_id>/update/', views.api_password_update, name='api_update'),
-    path('api/<uuid:password_id>/delete/', views.api_password_delete, name='api_delete'),
 ]

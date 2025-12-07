@@ -1,153 +1,521 @@
 {% extends 'base.html' %}
-
-{% block title %}Pass-Man - Secure Enterprise Password Management{% endblock %}
+{% load static %}
 
 {% block content %}
-<!-- Hero Section -->
-<section class="hero-section">
-    <div class="container">
-        <div class="row align-items-center">
-            <div class="col-lg-6">
-                <h1 class="display-4 fw-bold mb-4">
-                    <i class="bi bi-shield-lock-fill me-3"></i>
-                    Pass-Man
-                </h1>
-                <p class="lead mb-4">
-                    Enterprise-grade password management system designed for security, privacy, and team collaboration.
-                </p>
-                <div class="d-flex gap-3">
-                    {% if not user.is_authenticated %}
-                        <a href="/auth/register/" class="btn btn-light btn-lg">
-                            <i class="bi bi-person-plus me-2"></i>Get Started
+<div class="flex flex-col min-h-screen">
+    <!-- Header -->
+    <header class="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
+        <div class="container flex h-14 items-center">
+            <div class="mr-4 flex">
+                <a class="mr-6 flex items-center space-x-2" href="/">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="h-6 w-6"><rect width="18" height="11" x="3" y="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+                    <span class="font-bold">Pass-Man</span>
+                </a>
+                <nav class="hidden md:flex items-center space-x-6 text-sm font-medium">
+                    <a class="transition-colors hover:text-foreground/80 text-foreground/60" href="#">Features</a>
+                    <a class="transition-colors hover:text-foreground/80 text-foreground/60" href="#">Pricing</a>
+                    <a class="transition-colors hover:text-foreground/80 text-foreground/60" href="#">Enterprise</a>
+                </nav>
+            </div>
+            
+            <div class="flex flex-1 items-center justify-end space-x-4">
+                <nav class="flex items-center space-x-2">
+                    {% if user.is_authenticated %}
+                        <a href="{% url 'core:dashboard' %}" class="inline-flex items-center justify-center rounded-md text-sm font-medium h-9 px-4 py-2 hover:bg-accent hover:text-accent-foreground">
+                            Dashboard
                         </a>
-                        <a href="/auth/login/" class="btn btn-outline-light btn-lg">
-                            <i class="bi bi-box-arrow-in-right me-2"></i>Sign In
+                        <a href="{% url 'users:logout' %}" class="inline-flex items-center justify-center rounded-md text-sm font-medium h-9 px-4 py-2 border border-input bg-background hover:bg-accent hover:text-accent-foreground">
+                            Sign Out
                         </a>
                     {% else %}
-                        <a href="/dashboard/" class="btn btn-light btn-lg">
-                            <i class="bi bi-speedometer2 me-2"></i>Go to Dashboard
+                        <a href="{% url 'users:login' %}" class="inline-flex items-center justify-center rounded-md text-sm font-medium h-9 px-4 py-2 hover:bg-accent hover:text-accent-foreground">
+                            Log in
+                        </a>
+                        <a href="{% url 'users:register' %}" class="inline-flex items-center justify-center rounded-md text-sm font-medium h-9 px-4 py-2 bg-primary text-primary-foreground hover:bg-primary/90">
+                            Get Started
                         </a>
                     {% endif %}
-                </div>
-            </div>
-            <div class="col-lg-6 text-center">
-                <div class="hero-illustration">
-                    <i class="bi bi-shield-check" style="font-size: 12rem; opacity: 0.8;"></i>
-                </div>
+                </nav>
             </div>
         </div>
-    </div>
-</section>
+    </header>
 
-<!-- Features Section -->
-<section class="py-5">
-    <div class="container">
-        <div class="row text-center mb-5">
-            <div class="col-lg-8 mx-auto">
-                <h2 class="display-5 fw-bold mb-3">Why Choose Pass-Man?</h2>
-                <p class="lead text-muted">
-                    Built with enterprise security standards and privacy-first principles
-                </p>
-            </div>
-        </div>
-        
-        <div class="row g-4">
-            <div class="col-md-4">
-                <div class="card feature-card h-100 text-center p-4">
-                    <div class="card-body">
-                        <i class="bi bi-shield-lock text-primary" style="font-size: 3rem;"></i>
-                        <h4 class="card-title mt-3">Enterprise Security</h4>
-                        <p class="card-text">
-                            Military-grade encryption with AES-256, secure key management, and zero-knowledge architecture.
-                        </p>
+    <main class="flex-1">
+        {% if user.is_authenticated %}
+             <!-- Authenticated Dashboard Shortcut -->
+            <section class="container py-24 space-y-8">
+                <div class="flex flex-col items-center text-center space-y-4">
+                    <h1 class="text-3xl font-bold tracking-tighter sm:text-4xl">Welcome back, {{ user.username|default:"User" }}</h1>
+                    <p class="mx-auto max-w-[700px] text-muted-foreground">Access your secure vault.</p>
+                     <div class="flex gap-4">
+                        <a href="{% url 'core:dashboard' %}" class="inline-flex h-10 items-center justify-center rounded-md bg-primary px-8 text-sm font-medium text-primary-foreground shadow transition-colors hover:bg-primary/90">
+                            Go to Dashboard
+                        </a>
                     </div>
                 </div>
-            </div>
+            </section>
+        {% else %}
+             <!-- Hero Section -->
+            <section class="space-y-6 pb-8 pt-6 md:pb-12 md:pt-10 lg:py-32">
+                <div class="container flex max-w-[64rem] flex-col items-center gap-4 text-center">
+                    <a href="#" class="rounded-2xl bg-muted px-4 py-1.5 text-sm font-medium">Follow us on Twitter</a>
+                    <h1 class="font-bold text-3xl sm:text-5xl md:text-6xl lg:text-7xl">
+                        Secure. Simple. Shared.
+                    </h1>
+                    <p class="max-w-[42rem] leading-normal text-muted-foreground sm:text-xl sm:leading-8">
+                        The password manager for modern engineering teams. AES-256 encryption, zero-knowledge architecture, and seamless collaboration.
+                    </p>
+                    <div class="space-x-4">
+                        <a href="{% url 'users:register' %}" class="inline-flex h-11 items-center justify-center rounded-md bg-primary px-8 text-sm font-medium text-primary-foreground shadow transition-colors hover:bg-primary/90">
+                            Get Started
+                        </a>
+                        <a href="#" class="inline-flex h-11 items-center justify-center rounded-md border border-input bg-background px-8 text-sm font-medium shadow-sm transition-colors hover:bg-accent hover:text-accent-foreground">
+                            Learn more
+                        </a>
+                    </div>
+                </div>
+            </section>
             
-            <div class="col-md-4">
-                <div class="card feature-card h-100 text-center p-4">
-                    <div class="card-body">
-                        <i class="bi bi-people text-success" style="font-size: 3rem;"></i>
-                        <h4 class="card-title mt-3">Team Collaboration</h4>
-                        <p class="card-text">
-                            Secure password sharing, role-based access control, and group management for teams.
-                        </p>
+            <!-- Features Section -->
+            <section id="features" class="container space-y-6 bg-slate-50 py-8 dark:bg-transparent md:py-12 lg:py-24 rounded-lg">
+                <div class="mx-auto flex max-w-[58rem] flex-col items-center space-y-4 text-center">
+                    <h2 class="font-bold text-3xl leading-[1.1] sm:text-3xl md:text-6xl">Features</h2>
+                    <p class="leading-normal text-muted-foreground sm:text-lg sm:leading-7">
+                        Everything you need to manage your credentials securely.
+                    </p>
+                </div>
+                <div class="mx-auto grid justify-center gap-4 sm:grid-cols-2 md:max-w-[64rem] md:grid-cols-3">
+                    <div class="relative overflow-hidden rounded-lg border bg-background p-2">
+                        <div class="flex h-[180px] flex-col justify-between rounded-md p-6">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="h-12 w-12"><rect width="18" height="11" x="3" y="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+                            <div class="space-y-2">
+                                <h3 class="font-bold">Encryption</h3>
+                                <p class="text-sm text-muted-foreground">Military-grade AES-256 bit encryption.</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="relative overflow-hidden rounded-lg border bg-background p-2">
+                         <div class="flex h-[180px] flex-col justify-between rounded-md p-6">
+                           <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="h-12 w-12"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+                            <div class="space-y-2">
+                                <h3 class="font-bold">Teams</h3>
+                                <p class="text-sm text-muted-foreground">Share secrets securely with role-based access.</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="relative overflow-hidden rounded-lg border bg-background p-2">
+                         <div class="flex h-[180px] flex-col justify-between rounded-md p-6">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="h-12 w-12"><path d="M14 2v4a2 2 0 0 0 2 2h4"/><path d="M10 22v-6.5"/><path d="M6 15.5H22v6.5H6z"/><path d="M10 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h4"/></svg>
+                            <div class="space-y-2">
+                                <h3 class="font-bold">Auditing</h3>
+                                <p class="text-sm text-muted-foreground">Detailed logs of every access and modification.</p>
+                            </div>
+                        </div>
                     </div>
                 </div>
-            </div>
-            
-            <div class="col-md-4">
-                <div class="card feature-card h-100 text-center p-4">
-                    <div class="card-body">
-                        <i class="bi bi-eye-slash text-warning" style="font-size: 3rem;"></i>
-                        <h4 class="card-title mt-3">Privacy First</h4>
-                        <p class="card-text">
-                            Your data stays private. We can't see your passwords even if we wanted to.
-                        </p>
-                    </div>
-                </div>
-            </div>
+            </section>
+        {% endif %}
+    </main>
+    
+     <footer class="py-6 md:px-8 md:py-0">
+        <div class="container flex flex-col items-center justify-between gap-4 md:h-24 md:flex-row">
+            <p class="text-balance text-center text-sm leading-loose text-muted-foreground md:text-left">
+                Built by <a href="#" class="font-medium underline underline-offset-4">Pass-Man Inc</a>.
+            </p>
         </div>
-    </div>
-</section>
-
-<!-- Statistics Section -->
-<section class="py-5 bg-light">
-    <div class="container">
-        <div class="row text-center">
-            <div class="col-md-3">
-                <div class="mb-3">
-                    <i class="bi bi-shield-check text-success" style="font-size: 2.5rem;"></i>
-                </div>
-                <h3 class="fw-bold">100%</h3>
-                <p class="text-muted">Secure Encryption</p>
-            </div>
-            <div class="col-md-3">
-                <div class="mb-3">
-                    <i class="bi bi-lightning text-warning" style="font-size: 2.5rem;"></i>
-                </div>
-                <h3 class="fw-bold">Fast</h3>
-                <p class="text-muted">Quick Access</p>
-            </div>
-            <div class="col-md-3">
-                <div class="mb-3">
-                    <i class="bi bi-globe text-info" style="font-size: 2.5rem;"></i>
-                </div>
-                <h3 class="fw-bold">24/7</h3>
-                <p class="text-muted">Always Available</p>
-            </div>
-            <div class="col-md-3">
-                <div class="mb-3">
-                    <i class="bi bi-heart text-danger" style="font-size: 2.5rem;"></i>
-                </div>
-                <h3 class="fw-bold">Trusted</h3>
-                <p class="text-muted">By Enterprises</p>
-            </div>
-        </div>
-    </div>
-</section>
-
-<!-- CTA Section -->
-{% if not user.is_authenticated %}
-<section class="py-5">
-    <div class="container">
-        <div class="row">
-            <div class="col-lg-8 mx-auto text-center">
-                <h2 class="display-6 fw-bold mb-4">Ready to Secure Your Passwords?</h2>
-                <p class="lead mb-4">
-                    Join thousands of users who trust Pass-Man with their most sensitive data.
-                </p>
-                <div class="d-flex justify-content-center gap-3">
-                    <a href="/auth/register/" class="btn btn-primary btn-lg">
-                        <i class="bi bi-person-plus me-2"></i>Create Account
-                    </a>
-                    <a href="/auth/login/" class="btn btn-outline-primary btn-lg">
-                        <i class="bi bi-box-arrow-in-right me-2"></i>Sign In
-                    </a>
-                </div>
-            </div>
-        </div>
-    </div>
-</section>
-{% endif %}
+    </footer>
+</div>
 {% endblock %}
+
+        .hero::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><defs><pattern id="grain" width="100" height="100" patternUnits="userSpaceOnUse"><circle cx="50" cy="50" r="1" fill="rgba(255,255,255,0.03)"/></pattern></defs><rect width="100" height="100" fill="url(%23grain)"/></svg>');
+            opacity: 0.5;
+        }
+
+        .hero-content {
+            position: relative;
+            z-index: 1;
+            text-align: center;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+
+        .hero-icon {
+            width: 100px;
+            height: 100px;
+            background: rgba(255,255,255,0.2);
+            border-radius: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 30px;
+            backdrop-filter: blur(10px);
+        }
+
+        .hero h1 {
+            font-size: 3.5rem;
+            font-weight: 700;
+            margin-bottom: 20px;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        .hero h2 {
+            font-size: 1.5rem;
+            font-weight: 400;
+            margin-bottom: 30px;
+            opacity: 0.9;
+        }
+
+        .hero p {
+            font-size: 1.1rem;
+            margin-bottom: 40px;
+            opacity: 0.8;
+            line-height: 1.6;
+        }
+
+        .hero-buttons {
+            display: flex;
+            gap: 20px;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        /* Content Sections */
+        .content-section {
+            padding: 80px 0;
+        }
+
+        .section-header {
+            text-align: center;
+            margin-bottom: 60px;
+        }
+
+        .section-header h2 {
+            font-size: 2.5rem;
+            font-weight: 700;
+            color: #1f2937;
+            margin-bottom: 15px;
+        }
+
+        .section-header p {
+            font-size: 1.2rem;
+            color: #6b7280;
+            margin: 0;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+
+        /* Feature Cards */
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 40px;
+            margin-top: 60px;
+        }
+
+        .feature-card {
+            background: white;
+            border-radius: 12px;
+            padding: 40px 30px;
+            text-align: center;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+
+        .feature-card:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+        }
+
+        .feature-icon {
+            width: 80px;
+            height: 80px;
+            background: #eff6ff;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 20px;
+        }
+
+        .feature-card h3 {
+            font-size: 1.25rem;
+            font-weight: 600;
+            margin-bottom: 15px;
+            color: #1f2937;
+        }
+
+        .feature-card p {
+            color: #6b7280;
+            line-height: 1.6;
+            margin: 0;
+        }
+
+        /* Stats Section */
+        .stats-section {
+            background: white;
+            border-top: 1px solid #e5e7eb;
+            border-bottom: 1px solid #e5e7eb;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 40px;
+        }
+
+        .stat-item {
+            text-align: center;
+        }
+
+        .stat-number {
+            font-size: 3rem;
+            font-weight: 700;
+            color: #3b82f6;
+            margin-bottom: 10px;
+        }
+
+        .stat-label {
+            font-size: 1rem;
+            color: #6b7280;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        /* CTA Section */
+        .cta-section {
+            background: #1f2937;
+            color: white;
+            text-align: center;
+        }
+
+        .cta-section h2 {
+            font-size: 2.5rem;
+            font-weight: 700;
+            margin-bottom: 20px;
+        }
+
+        .cta-section p {
+            font-size: 1.2rem;
+            margin-bottom: 40px;
+            opacity: 0.8;
+        }
+
+        /* Quick Actions for Authenticated Users */
+        .quick-actions {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 30px;
+            margin-top: 60px;
+        }
+
+        .action-card {
+            background: white;
+            border-radius: 12px;
+            padding: 30px;
+            text-align: center;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .action-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+        }
+
+        .action-icon {
+            width: 60px;
+            height: 60px;
+            background: #eff6ff;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 15px;
+        }
+
+        /* Mobile Responsive */
+        @media (max-width: 768px) {
+            .hero {
+                padding: 60px 0 80px;
+            }
+
+            .hero h1 {
+                font-size: 2.5rem;
+            }
+
+            .hero h2 {
+                font-size: 1.2rem;
+            }
+
+            .hero-buttons {
+                flex-direction: column;
+                align-items: center;
+            }
+
+            .section-header h2 {
+                font-size: 2rem;
+            }
+
+            .features-grid {
+                grid-template-columns: 1fr;
+                gap: 30px;
+            }
+        }
+    </style>
+
+    {% block extra_css %}{% endblock %}
+</head>
+<body>
+    {% if user.is_authenticated %}
+        <div class="hero">
+            <div class="hero-content">
+                <h1>Welcome Back!</h1>
+                <h2>Manage your passwords securely with Pass-Man</h2>
+            </div>
+        </div>
+
+        <div class="content-section">
+            <div class="container">
+                <div class="quick-actions">
+                    <div class="action-card" onclick="window.location.href='{% url 'passwords:create' %}'">
+                        <div class="action-icon">
+                            <wa-icon name="plus-lg" style="font-size: 1.5rem; color: #3b82f6;"></wa-icon>
+                        </div>
+                        <h3>Add Password</h3>
+                        <p>Store a new password securely</p>
+                    </div>
+
+                    <div class="action-card" onclick="window.location.href='{% url 'passwords:list' %}'">
+                        <div class="action-icon">
+                            <wa-icon name="shield-lock" style="font-size: 1.5rem; color: #10b981;"></wa-icon>
+                        </div>
+                        <h3>View Passwords</h3>
+                        <p>Browse your password collection</p>
+                    </div>
+
+                    <div class="action-card" onclick="window.location.href='{% url 'groups:list' %}'">
+                        <div class="action-icon">
+                            <wa-icon name="people" style="font-size: 1.5rem; color: #8b5cf6;"></wa-icon>
+                        </div>
+                        <h3>Manage Groups</h3>
+                        <p>Organize and share with teams</p>
+                    </div>
+
+                    <div class="action-card" onclick="window.location.href='{% url 'core:dashboard' %}'">
+                        <div class="action-icon">
+                            <wa-icon name="speedometer2" style="font-size: 1.5rem; color: #f59e0b;"></wa-icon>
+                        </div>
+                        <h3>Dashboard</h3>
+                        <p>View statistics and insights</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    {% else %}
+        <div class="hero">
+            <div class="hero-content">
+                <div class="hero-icon">
+                    <wa-icon name="shield-key" style="font-size: 3rem;"></wa-icon>
+                </div>
+                <h1>Pass-Man</h1>
+                <h2>Enterprise Password Management</h2>
+                <p>Secure, share, and manage all your passwords with military-grade encryption. Built for teams that prioritize security without compromising productivity.</p>
+                <div class="hero-buttons">
+                    <wa-button variant="default" size="large" href="{% url 'users:register' %}">
+                        <wa-icon name="person-plus" slot="prefix"></wa-icon>
+                        Get Started Free
+                    </wa-button>
+                    <wa-button variant="default" outline size="large" href="{% url 'users:login' %}" style="border-color: white; color: white;">
+                        <wa-icon name="box-arrow-in-right" slot="prefix"></wa-icon>
+                        Sign In
+                    </wa-button>
+                </div>
+            </div>
+        </div>
+
+        <div class="content-section">
+            <div class="container">
+                <div class="section-header">
+                    <h2>Why Choose Pass-Man?</h2>
+                    <p>Enterprise-grade security with user-friendly experience</p>
+                </div>
+
+                <div class="features-grid">
+                    <div class="feature-card">
+                        <div class="feature-icon">
+                            <wa-icon name="shield-lock" style="font-size: 2rem; color: #3b82f6;"></wa-icon>
+                        </div>
+                        <h3>Military-Grade Encryption</h3>
+                        <p>AES-256 encryption ensures your passwords are always protected, both in transit and at rest</p>
+                    </div>
+
+                    <div class="feature-card">
+                        <div class="feature-icon">
+                            <wa-icon name="people" style="font-size: 2rem; color: #3b82f6;"></wa-icon>
+                        </div>
+                        <h3>Team Collaboration</h3>
+                        <p>Share passwords securely with your team. Control access with granular permissions</p>
+                    </div>
+
+                    <div class="feature-card">
+                        <div class="feature-icon">
+                            <wa-icon name="lightning" style="font-size: 2rem; color: #3b82f6;"></wa-icon>
+                        </div>
+                        <h3>Password Generator</h3>
+                        <p>Create strong, unique passwords instantly with our advanced password generator</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="content-section stats-section">
+            <div class="container">
+                <div class="stats-grid">
+                    <div class="stat-item">
+                        <div class="stat-number">10M+</div>
+                        <div class="stat-label">Passwords Secured</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-number">50K+</div>
+                        <div class="stat-label">Teams Trust Us</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-number">99.9%</div>
+                        <div class="stat-label">Uptime SLA</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-number">24/7</div>
+                        <div class="stat-label">Support Available</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="content-section cta-section">
+            <div class="container">
+                <h2>Ready to Secure Your Passwords?</h2>
+                <p>Join thousands of teams who trust Pass-Man with their sensitive data</p>
+                <wa-button variant="default" size="large" href="{% url 'users:register' %}">
+                    <wa-icon name="rocket" slot="prefix"></wa-icon>
+                    Start Your Free Trial
+                </wa-button>
+            </div>
+        </div>
+    {% endif %}
+
+    {% block extra_js %}{% endblock %}
+</body>
+</html>

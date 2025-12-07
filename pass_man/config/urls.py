@@ -32,12 +32,12 @@ urlpatterns = [
     
     # API endpoints
     path('api/auth/', include('apps.users.urls')),
-    path('api/passwords/', include('apps.passwords.urls')),
-    path('api/groups/', include('apps.groups.urls')),
+    path('api/passwords/', include('apps.passwords.api_urls')),
+    path('api/groups/', include('apps.groups.api_urls')),
+    path('api/directories/', include('apps.directories.api_urls')),
     
-    # Directories management (to be implemented in Epic 5)
-    # path('directories/', include('apps.directories.urls')),
-    # path('api/directories/', include('apps.directories.urls')),
+    # Directories management
+    path('directories/', include('apps.directories.urls')),
 ]
 
 # Serve static and media files in development
@@ -45,14 +45,7 @@ if settings.DEBUG:
     urlpatterns += static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
     urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
     
-    # Debug Toolbar
-    try:
-        import debug_toolbar
-        urlpatterns += [
-            path('__debug__/', include(debug_toolbar.urls)),
-        ]
-    except ImportError:
-        pass
+
 
 # Custom error handlers
 handler400 = 'apps.core.views.handler400'

@@ -1,337 +1,84 @@
-{% extends 'base.html' %}
+{% extends "layouts/authenticated_content.html" %}
+{% load static %}
 
-{% block title %}{{ page_title }} - Pass-Man{% endblock %}
+{% block page_title %}{% if is_create %}Create New Group{% else %}Edit Group{% endif %}{% endblock %}
 
-{% block extra_css %}
-<style>
-    .form-container {
-        max-width: 600px;
-        margin: 0 auto;
-        padding: 2rem;
-    }
-    
-    .form-header {
-        margin-bottom: 2rem;
-    }
-    
-    .form-title {
-        font-size: 2rem;
-        font-weight: bold;
-        color: #1f2937;
-        margin-bottom: 0.5rem;
-    }
-    
-    .form-subtitle {
-        color: #6b7280;
-        font-size: 1.125rem;
-    }
-    
-    .form-card {
-        background: white;
-        border-radius: 12px;
-        padding: 2rem;
-        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
-        border: 1px solid #e5e7eb;
-    }
-    
-    .form-group {
-        margin-bottom: 1.5rem;
-    }
-    
-    .form-label {
-        display: block;
-        margin-bottom: 0.5rem;
-        font-weight: 500;
-        color: #374151;
-    }
-    
-    .form-label.required::after {
-        content: ' *';
-        color: #ef4444;
-    }
-    
-    .form-input, .form-textarea {
-        width: 100%;
-        padding: 0.75rem 1rem;
-        border: 2px solid #e5e7eb;
-        border-radius: 8px;
-        font-size: 1rem;
-        transition: border-color 0.2s, box-shadow 0.2s;
-    }
-    
-    .form-input:focus, .form-textarea:focus {
-        outline: none;
-        border-color: #3b82f6;
-        box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
-    }
-    
-    .form-input.error, .form-textarea.error {
-        border-color: #ef4444;
-    }
-    
-    .form-textarea {
-        resize: vertical;
-        min-height: 100px;
-    }
-    
-    .form-error {
-        color: #ef4444;
-        font-size: 0.875rem;
-        margin-top: 0.25rem;
-    }
-    
-    .form-help {
-        color: #6b7280;
-        font-size: 0.875rem;
-        margin-top: 0.25rem;
-    }
-    
-    .form-actions {
-        display: flex;
-        gap: 1rem;
-        justify-content: flex-end;
-        margin-top: 2rem;
-        padding-top: 2rem;
-        border-top: 1px solid #e5e7eb;
-    }
-    
-    .btn {
-        padding: 0.75rem 1.5rem;
-        border-radius: 8px;
-        font-weight: 600;
-        text-decoration: none;
-        display: inline-flex;
-        align-items: center;
-        gap: 0.5rem;
-        transition: transform 0.2s, box-shadow 0.2s;
-        border: none;
-        cursor: pointer;
-    }
-    
-    .btn:hover {
-        transform: translateY(-1px);
-        text-decoration: none;
-    }
-    
-    .btn-primary {
-        background: linear-gradient(135deg, #3b82f6, #1d4ed8);
-        color: white;
-    }
-    
-    .btn-primary:hover {
-        box-shadow: 0 4px 12px rgba(59, 130, 246, 0.4);
-        color: white;
-    }
-    
-    .btn-secondary {
-        background: #f3f4f6;
-        color: #374151;
-        border: 2px solid #d1d5db;
-    }
-    
-    .btn-secondary:hover {
-        background: #e5e7eb;
-        color: #374151;
-    }
-    
-    .info-box {
-        background: #f0f9ff;
-        border: 1px solid #bae6fd;
-        border-radius: 8px;
-        padding: 1rem;
-        margin-bottom: 1.5rem;
-    }
-    
-    .info-box-title {
-        font-weight: 600;
-        color: #0369a1;
-        margin-bottom: 0.5rem;
-    }
-    
-    .info-box-content {
-        color: #0c4a6e;
-        font-size: 0.875rem;
-        line-height: 1.4;
-    }
-    
-    @media (max-width: 768px) {
-        .form-container {
-            padding: 1rem;
-        }
-        
-        .form-actions {
-            flex-direction: column;
-        }
-        
-        .btn {
-            justify-content: center;
-        }
-    }
-</style>
-{% endblock %}
-
-{% block content %}
-<div class="form-container">
-    <!-- Header -->
-    <div class="form-header">
-        <h1 class="form-title">{{ page_title }}</h1>
-        <p class="form-subtitle">
-            {% if is_create %}
-                Create a new group to collaborate and share passwords securely
-            {% else %}
-                Update group information and settings
-            {% endif %}
+{% block authenticated_content %}
+<div class="max-w-2xl mx-auto">
+    <div class="mb-6">
+        <h2 class="text-2xl font-bold tracking-tight">
+            {% if is_create %}Create New Group{% else %}Edit Group{% endif %}
+        </h2>
+        <p class="text-muted-foreground">
+            {% if is_create %}Create a new group to share passwords with your team.{% else %}Update your group details.{% endif %}
         </p>
     </div>
-    
-    <!-- Info Box -->
-    {% if is_create %}
-        <div class="info-box">
-            <div class="info-box-title">💡 About Groups</div>
-            <div class="info-box-content">
-                Groups allow you to organize and share passwords with team members. You'll be the owner of this group and can manage members and their roles.
-            </div>
-        </div>
-    {% endif %}
-    
-    <!-- Form -->
-    <div class="form-card">
-        <form method="post" id="groupForm">
+
+    <div class="rounded-lg border bg-card text-card-foreground shadow-sm">
+        <form method="post" class="p-6 space-y-6">
             {% csrf_token %}
             
-            <div class="form-group">
-                <label for="name" class="form-label required">Group Name</label>
-                <input 
-                    type="text" 
-                    id="name" 
-                    name="name" 
-                    class="form-input {% if errors.name %}error{% endif %}"
-                    value="{% if group %}{{ group.name }}{% elif form_data.name %}{{ form_data.name }}{% endif %}"
-                    placeholder="e.g., Development Team, Marketing Department"
-                    required
-                    autofocus
-                    maxlength="100"
-                >
-                {% if errors.name %}
-                    <div class="form-error">
-                        {% if errors.name|length > 1 %}
-                            <ul>
-                                {% for error in errors.name %}
-                                    <li>{{ error }}</li>
-                                {% endfor %}
-                            </ul>
-                        {% else %}
-                            {{ errors.name.0 }}
-                        {% endif %}
-                    </div>
-                {% endif %}
-                <div class="form-help">Choose a descriptive name for your group (max 100 characters)</div>
-            </div>
-            
-            <div class="form-group">
-                <label for="description" class="form-label">Description</label>
-                <textarea 
-                    id="description" 
-                    name="description" 
-                    class="form-textarea {% if errors.description %}error{% endif %}"
-                    placeholder="Optional description of the group's purpose..."
-                    rows="4"
-                >{% if group %}{{ group.description }}{% elif form_data.description %}{{ form_data.description }}{% endif %}</textarea>
-                {% if errors.description %}
-                    <div class="form-error">{{ errors.description.0 }}</div>
-                {% endif %}
-                <div class="form-help">Provide additional context about this group's purpose (optional)</div>
-            </div>
-            
-            {% if not is_create and group.is_personal %}
-                <div class="info-box" style="background: #fef3c7; border-color: #fcd34d;">
-                    <div class="info-box-title" style="color: #d97706;">⚠️ Personal Group</div>
-                    <div class="info-box-content" style="color: #92400e;">
-                        This is your personal vault group. It cannot be deleted and is automatically created for organizing your personal passwords.
-                    </div>
+            {% if errors.non_field_errors %}
+                <div class="rounded-md bg-destructive/15 p-3 text-sm text-destructive">
+                    {% for error in errors.non_field_errors %}
+                        <p>{{ error }}</p>
+                    {% endfor %}
                 </div>
             {% endif %}
-            
-            <!-- Form Actions -->
-            <div class="form-actions">
-                <a href="{% if group %}{% url 'groups:detail' group.id %}{% else %}{% url 'groups:list' %}{% endif %}" class="btn btn-secondary">
+
+            <div class="space-y-4">
+                <!-- Name -->
+                <div class="space-y-2">
+                    <label for="name" class="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">
+                        Group Name
+                    </label>
+                    <div class="relative">
+                        <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                             <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="h-4 w-4 text-muted-foreground"><path d="M4 20h16a2 2 0 0 0 2-2V8a2 2 0 0 0-2-2h-7.93a2 2 0 0 1-1.66-.9l-.82-1.2A2 2 0 0 0 7.93 2H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2Z"/></svg>
+                        </div>
+                         <input
+                            type="text"
+                            name="name"
+                            id="name"
+                            value="{{ form_data.name|default:group.name|default:'' }}"
+                            placeholder="e.g. Marketing Team"
+                            class="flex h-10 w-full rounded-md border border-input bg-transparent pl-9 px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
+                            required
+                        >
+                    </div>
+                    {% if errors.name %}
+                        <p class="text-sm font-medium text-destructive">{{ errors.name.0 }}</p>
+                    {% endif %}
+                </div>
+
+                <!-- Description -->
+                <div class="space-y-2">
+                    <label for="description" class="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">
+                        Description
+                    </label>
+                    <textarea
+                        name="description"
+                        id="description"
+                        rows="4"
+                        placeholder="Describe the purpose of this group..."
+                        class="flex min-h-[80px] w-full rounded-md border border-input bg-transparent px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
+                    >{{ form_data.description|default:group.description|default:'' }}</textarea>
+                    {% if errors.description %}
+                        <p class="text-sm font-medium text-destructive">{{ errors.description.0 }}</p>
+                    {% endif %}
+                </div>
+            </div>
+
+            <!-- Actions -->
+            <div class="flex items-center justify-end gap-2 pt-4 border-t">
+                <a href="{% url 'groups:list' %}" class="inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 border border-input bg-background hover:bg-accent hover:text-accent-foreground h-10 px-4 py-2">
                     Cancel
                 </a>
-                <button type="submit" class="btn btn-primary">
-                    {% if is_create %}
-                        👥 Create Group
-                    {% else %}
-                        💾 Update Group
-                    {% endif %}
+                <button type="submit" class="inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 bg-primary text-primary-foreground hover:bg-primary/90 h-10 px-4 py-2">
+                    {% if is_create %}Create Group{% else %}Update Group{% endif %}
                 </button>
             </div>
         </form>
     </div>
 </div>
-{% endblock %}
-
-{% block extra_js %}
-<script>
-document.addEventListener('DOMContentLoaded', function() {
-    // Character counter for group name
-    const nameInput = document.getElementById('name');
-    const maxLength = 100;
-    
-    function updateCharacterCount() {
-        const remaining = maxLength - nameInput.value.length;
-        const helpText = nameInput.parentElement.querySelector('.form-help');
-        
-        if (remaining < 20) {
-            helpText.style.color = remaining < 5 ? '#ef4444' : '#f59e0b';
-            helpText.textContent = `${remaining} characters remaining`;
-        } else {
-            helpText.style.color = '#6b7280';
-            helpText.textContent = 'Choose a descriptive name for your group (max 100 characters)';
-        }
-    }
-    
-    nameInput.addEventListener('input', updateCharacterCount);
-    updateCharacterCount(); // Initial call
-    
-    // Form validation
-    const form = document.getElementById('groupForm');
-    
-    form.addEventListener('submit', function(e) {
-        const name = nameInput.value.trim();
-        
-        if (!name) {
-            e.preventDefault();
-            nameInput.focus();
-            nameInput.classList.add('error');
-            
-            // Show error message
-            let errorDiv = nameInput.parentElement.querySelector('.form-error');
-            if (!errorDiv) {
-                errorDiv = document.createElement('div');
-                errorDiv.className = 'form-error';
-                nameInput.parentElement.insertBefore(errorDiv, nameInput.nextSibling);
-            }
-            errorDiv.textContent = 'Group name is required';
-            
-            return false;
-        }
-        
-        // Remove error styling if validation passes
-        nameInput.classList.remove('error');
-        const errorDiv = nameInput.parentElement.querySelector('.form-error');
-        if (errorDiv) {
-            errorDiv.remove();
-        }
-    });
-    
-    // Remove error styling on input
-    nameInput.addEventListener('input', function() {
-        this.classList.remove('error');
-        const errorDiv = this.parentElement.querySelector('.form-error');
-        if (errorDiv && !errorDiv.textContent.includes('characters remaining')) {
-            errorDiv.remove();
-        }
-    });
-});
-</script>
 {% endblock %}

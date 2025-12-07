@@ -1,0 +1,101 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+<div class="grid min-h-screen w-full lg:grid-cols-[280px_1fr]">
+    <!-- Sidebar (Desktop) -->
+    <div class="hidden border-r bg-muted/40 lg:block">
+        <div class="flex h-full max-h-screen flex-col gap-2">
+            {% include "partials/sidebar.html" %}
+        </div>
+    </div>
+
+    <!-- Main Content Area -->
+    <div class="flex flex-col">
+        <!-- Header -->
+        <header class="flex h-14 items-center gap-4 border-b bg-muted/40 px-6 lg:h-[60px]">
+            <!-- Mobile Sidebar Trigger (Alpine) -->
+            <div class="lg:hidden" x-data="{ open: false }">
+                <button @click="open = true" class="inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 border border-input bg-background hover:bg-accent hover:text-accent-foreground h-10 w-10">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="h-5 w-5"><line x1="4" x2="20" y1="12" y2="12"/><line x1="4" x2="20" y1="6" y2="6"/><line x1="4" x2="20" y1="18" y2="18"/></svg>
+                    <span class="sr-only">Toggle navigation menu</span>
+                </button>
+                
+                <!-- Mobile Sidebar Overlay/Drawer -->
+                <div x-show="open" class="fixed inset-0 z-50 bg-black/80" @click="open = false" x-transition.opacity x-cloak></div>
+                <div x-show="open" class="fixed inset-y-0 left-0 z-50 w-[280px] border-r bg-background transition-transform" 
+                     x-transition:enter="transform transition ease-in-out duration-300"
+                     x-transition:enter-start="-translate-x-full"
+                     x-transition:enter-end="translate-x-0"
+                     x-transition:leave="transform transition ease-in-out duration-300"
+                     x-transition:leave-start="translate-x-0"
+                     x-transition:leave-end="-translate-x-full"
+                     x-cloak>
+                     <div class="flex h-full flex-col gap-2">
+                        {% include "partials/sidebar.html" %}
+                     </div>
+                </div>
+            </div>
+
+            <!-- Breadcrumb / Title -->
+            <div class="w-full flex-1">
+                <h1 class="text-lg font-semibold md:text-xl">{% block page_title %}Dashboard{% endblock %}</h1>
+            </div>
+
+            <!-- User Menu -->
+            <div class="flex items-center gap-4" x-data="{ open: false }">
+                <div class="relative">
+                    <button @click="open = !open" @click.outside="open = false" class="inline-flex items-center justify-center rounded-full border border-gray-200 w-8 h-8 bg-gray-100 text-gray-600 hover:bg-gray-200 focus:outline-none">
+                        <span class="sr-only">Toggle user menu</span>
+                        <span class="font-medium text-xs">{{ user.email|slice:":2"|upper }}</span>
+                    </button>
+                    <!-- Dropdown -->
+                    <div x-show="open" class="absolute right-0 mt-2 w-56 origin-top-right rounded-md border bg-popover text-popover-foreground shadow-md outline-none animate-in fade-in-0 zoom-in-95" x-cloak>
+                        <div class="flex items-center justify-start gap-2 p-2">
+                            <div class="flex flex-col space-y-1 leading-none">
+                                <p class="font-medium">{{ user.full_name|default:user.email }}</p>
+                                <p class="text-xs text-muted-foreground">{{ user.email }}</p>
+                            </div>
+                        </div>
+                        <div class="h-px bg-muted"></div>
+                        <div class="p-1">
+                            <a href="#" class="relative flex cursor-default select-none items-center rounded-sm px-2 py-1.5 text-sm outline-none transition-colors hover:bg-accent hover:text-accent-foreground">
+                                Profile
+                            </a>
+                            <a href="#" class="relative flex cursor-default select-none items-center rounded-sm px-2 py-1.5 text-sm outline-none transition-colors hover:bg-accent hover:text-accent-foreground">
+                                Settings
+                            </a>
+                        </div>
+                        <div class="h-px bg-muted"></div>
+                        <div class="p-1">
+                            <a href="{% url 'users:logout' %}" class="relative flex cursor-default select-none items-center rounded-sm px-2 py-1.5 text-sm outline-none transition-colors hover:bg-accent hover:text-accent-foreground">
+                                Log out
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </header>
+
+        <!-- Main Content -->
+        <main class="flex flex-1 flex-col gap-4 p-4 lg:gap-6 lg:p-6 bg-muted/10 min-h-[calc(100vh-60px)]">
+            {% if messages %}
+                <div class="space-y-2">
+                    {% for message in messages %}
+                        <div class="relative w-full rounded-lg border p-4 [&>svg~*]:pl-7 [&>svg+div]:translate-y-[-3px] [&>svg]:absolute [&>svg]:left-4 [&>svg]:top-4 [&>svg]:text-foreground
+                            {% if message.tags == 'error' %}border-destructive/50 text-destructive dark:border-destructive [&>svg]:text-destructive{% else %}bg-background text-foreground{% endif %}">
+                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="h-4 w-4">
+                                {% if message.tags == 'error' %}<circle cx="12" cy="12" r="10"/><line x1="12" x2="12" y1="8" y2="12"/><line x1="12" x2="12.01" y1="16" y2="16"/>
+                                {% else %}<path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/>{% endif %}
+                            </svg>
+                            <div class="text-sm font-medium">{{ message }}</div>
+                        </div>
+                    {% endfor %}
+                </div>
+            {% endif %}
+
+            {% block authenticated_content %}{% endblock %}
+        </main>
+    </div>
+</div>
+{% endblock %}

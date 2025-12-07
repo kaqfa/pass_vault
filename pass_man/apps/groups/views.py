@@ -62,15 +62,40 @@ class GroupListView(LoginRequiredMixin, BaseView):
             page_number = request.GET.get('page')
             page_obj = paginator.get_page(page_number)
             
+            # Serialize groups for Alpine.js
+            groups_json = []
+            for group in page_obj:
+                groups_json.append({
+                    'id': str(group.id),
+                    'name': group.name,
+                    'description': group.description,
+                    'owner': group.owner.full_name or group.owner.email,
+                    'is_personal': group.is_personal,
+                    'password_count': group.get_password_count(),
+                    'member_count': group.get_member_count(),
+                    # 'shared_count': group.get_shared_count(), # Method doesn't exist on model yet, maybe just 0
+                    'shared_count': 0, 
+                    'type': 'owned' if group.owner == request.user else 'shared', # Simplified logic
+                    'last_updated': group.updated_at.strftime('%Y-%m-%d'),
+                    'tags': [] # Add tags if the model supports it
+                })
+
             context = {
                 'page_title': 'My Groups',
                 'groups': page_obj,
+                'groups_json': json.dumps(groups_json),  # Serialize to JSON string
                 'search_query': query,
                 'current_filters': {
                     'role': role_filter
                 },
                 'role_choices': UserGroup.Role.choices,
-                'total_count': len(groups)
+                'total_count': len(groups),
+                 # Mock stats for now, or fetch real stats
+                'stats': {
+                    'total_groups': len(groups),
+                    'shared_groups': 0, 
+                    'total_passwords': 0
+                }
             }
             
             return render(request, self.template_name, context)

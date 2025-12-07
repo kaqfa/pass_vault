@@ -1,705 +1,119 @@
-{% extends 'base.html' %}
+{% extends "layouts/authenticated_content.html" %}
+{% load static %}
 
-{% block title %}{{ page_title }} - Pass-Man{% endblock %}
+{% block page_title %}{{ group.name }} - Members{% endblock %}
 
-{% block extra_css %}
-<style>
-    .members-container {
-        max-width: 1000px;
-        margin: 0 auto;
-        padding: 2rem;
-    }
-    
-    .members-header {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        margin-bottom: 2rem;
-        flex-wrap: wrap;
-        gap: 1rem;
-    }
-    
-    .members-title {
-        font-size: 2rem;
-        font-weight: bold;
-        color: #1f2937;
-        flex: 1;
-    }
-    
-    .btn {
-        padding: 0.75rem 1.5rem;
-        border-radius: 8px;
-        font-weight: 600;
-        text-decoration: none;
-        display: inline-flex;
-        align-items: center;
-        gap: 0.5rem;
-        transition: transform 0.2s, box-shadow 0.2s;
-        border: none;
-        cursor: pointer;
-    }
-    
-    .btn:hover {
-        transform: translateY(-1px);
-        text-decoration: none;
-    }
-    
-    .btn-primary {
-        background: linear-gradient(135deg, #3b82f6, #1d4ed8);
-        color: white;
-    }
-    
-    .btn-primary:hover {
-        box-shadow: 0 4px 12px rgba(59, 130, 246, 0.4);
-        color: white;
-    }
-    
-    .btn-secondary {
-        background: #f3f4f6;
-        color: #374151;
-        border: 2px solid #d1d5db;
-    }
-    
-    .btn-secondary:hover {
-        background: #e5e7eb;
-        color: #374151;
-    }
-    
-    .btn-danger {
-        background: linear-gradient(135deg, #ef4444, #dc2626);
-        color: white;
-    }
-    
-    .btn-danger:hover {
-        box-shadow: 0 4px 12px rgba(239, 68, 68, 0.4);
-        color: white;
-    }
-    
-    .btn-small {
-        padding: 0.5rem 0.75rem;
-        font-size: 0.875rem;
-    }
-    
-    .add-member-card {
-        background: white;
-        border-radius: 12px;
-        padding: 2rem;
-        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
-        border: 1px solid #e5e7eb;
-        margin-bottom: 2rem;
-    }
-    
-    .card-title {
-        font-size: 1.25rem;
-        font-weight: 600;
-        color: #1f2937;
-        margin-bottom: 1rem;
-    }
-    
-    .add-member-form {
-        display: flex;
-        gap: 1rem;
-        align-items: end;
-        flex-wrap: wrap;
-    }
-    
-    .form-group {
-        flex: 1;
-        min-width: 200px;
-    }
-    
-    .form-label {
-        display: block;
-        margin-bottom: 0.5rem;
-        font-weight: 500;
-        color: #374151;
-        font-size: 0.875rem;
-    }
-    
-    .form-input, .form-select {
-        width: 100%;
-        padding: 0.75rem;
-        border: 2px solid #e5e7eb;
-        border-radius: 8px;
-        font-size: 1rem;
-        transition: border-color 0.2s;
-    }
-    
-    .form-input:focus, .form-select:focus {
-        outline: none;
-        border-color: #3b82f6;
-    }
-    
-    .form-input.error, .form-select.error {
-        border-color: #ef4444;
-    }
-    
-    .form-error {
-        color: #ef4444;
-        font-size: 0.875rem;
-        margin-top: 0.25rem;
-    }
-    
-    .members-list-card {
-        background: white;
-        border-radius: 12px;
-        padding: 2rem;
-        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
-        border: 1px solid #e5e7eb;
-    }
-    
-    .member-item {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        padding: 1.5rem;
-        background: #f9fafb;
-        border-radius: 8px;
-        margin-bottom: 1rem;
-        border: 1px solid #f3f4f6;
-    }
-    
-    .member-item:last-child {
-        margin-bottom: 0;
-    }
-    
-    .member-info {
-        flex: 1;
-    }
-    
-    .member-name {
-        font-weight: 600;
-        color: #1f2937;
-        margin-bottom: 0.25rem;
-        font-size: 1.125rem;
-    }
-    
-    .member-email {
-        color: #6b7280;
-        font-size: 0.875rem;
-        margin-bottom: 0.5rem;
-    }
-    
-    .member-meta {
-        color: #6b7280;
-        font-size: 0.75rem;
-        display: flex;
-        gap: 1rem;
-        flex-wrap: wrap;
-    }
-    
-    .member-actions {
-        display: flex;
-        align-items: center;
-        gap: 1rem;
-        flex-wrap: wrap;
-    }
-    
-    .role-badge {
-        padding: 0.25rem 0.75rem;
-        border-radius: 12px;
-        font-size: 0.75rem;
-        font-weight: 600;
-        text-transform: uppercase;
-    }
-    
-    .role-owner {
-        background: #fee2e2;
-        color: #dc2626;
-    }
-    
-    .role-admin {
-        background: #fef3c7;
-        color: #d97706;
-    }
-    
-    .role-member {
-        background: #f3f4f6;
-        color: #6b7280;
-    }
-    
-    .role-select {
-        padding: 0.5rem;
-        border: 1px solid #d1d5db;
-        border-radius: 6px;
-        font-size: 0.875rem;
-        background: white;
-    }
-    
-    .empty-members {
-        text-align: center;
-        padding: 3rem;
-        color: #6b7280;
-    }
-    
-    .empty-icon {
-        font-size: 4rem;
-        margin-bottom: 1rem;
-    }
-    
-    .empty-title {
-        font-size: 1.25rem;
-        font-weight: 600;
-        margin-bottom: 0.5rem;
-        color: #374151;
-    }
-    
-    .loading {
-        opacity: 0.6;
-        pointer-events: none;
-    }
-    
-    .success-message {
-        background: #f0fdf4;
-        border: 1px solid #bbf7d0;
-        color: #166534;
-        padding: 0.75rem 1rem;
-        border-radius: 8px;
-        margin-bottom: 1rem;
-        font-size: 0.875rem;
-    }
-    
-    .error-message {
-        background: #fef2f2;
-        border: 1px solid #fecaca;
-        color: #dc2626;
-        padding: 0.75rem 1rem;
-        border-radius: 8px;
-        margin-bottom: 1rem;
-        font-size: 0.875rem;
-    }
-    
-    @media (max-width: 768px) {
-        .members-container {
-            padding: 1rem;
-        }
-        
-        .members-header {
-            flex-direction: column;
-            align-items: stretch;
-        }
-        
-        .add-member-form {
-            flex-direction: column;
-        }
-        
-        .form-group {
-            min-width: auto;
-        }
-        
-        .member-item {
-            flex-direction: column;
-            align-items: stretch;
-            gap: 1rem;
-        }
-        
-        .member-actions {
-            justify-content: center;
-        }
-    }
-</style>
-{% endblock %}
-
-{% block content %}
-<div class="members-container">
+{% block authenticated_content %}
+<div class="max-w-4xl mx-auto" x-data="{ showAddMemberModal: false }">
     <!-- Header -->
-    <div class="members-header">
-        <h1 class="members-title">{{ page_title }}</h1>
-        <a href="{% url 'groups:detail' group.id %}" class="btn btn-secondary">
-            ← Back to Group
-        </a>
-    </div>
-    
-    <!-- Add Member Section -->
-    <div class="add-member-card">
-        <h2 class="card-title">Add New Member</h2>
-        
-        <div id="messageContainer"></div>
-        
-        <form id="addMemberForm" class="add-member-form">
-            {% csrf_token %}
-            <div class="form-group">
-                <label for="email" class="form-label">Email Address</label>
-                <input 
-                    type="email" 
-                    id="email" 
-                    name="email" 
-                    class="form-input"
-                    placeholder="user@example.com"
-                    required
-                >
-                <div class="form-error" id="emailError" style="display: none;"></div>
+    <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-6">
+        <div>
+            <div class="flex items-center gap-2 text-muted-foreground text-sm mb-1">
+                <a href="{% url 'groups:detail' group.pk %}" class="hover:text-foreground transition-colors flex items-center gap-1">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="h-3 w-3"><path d="m15 18-6-6 6-6"/></svg>
+                    Back to Group
+                </a>
             </div>
-            
-            <div class="form-group">
-                <label for="role" class="form-label">Role</label>
-                <select id="role" name="role" class="form-select">
-                    {% for value, label in role_choices %}
-                        {% if value != 'owner' %}
-                            <option value="{{ value }}" {% if value == 'member' %}selected{% endif %}>
-                                {{ label }}
-                            </option>
-                        {% endif %}
-                    {% endfor %}
-                </select>
-            </div>
-            
-            <button type="submit" class="btn btn-primary">
-                ➕ Add Member
-            </button>
-        </form>
+            <h1 class="text-2xl font-bold tracking-tight text-foreground">Manage Members</h1>
+            <p class="text-muted-foreground mt-1">Manage access and roles for <span class="font-medium text-foreground">{{ group.name }}</span></p>
+        </div>
+        <button @click="showAddMemberModal = true" class="inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 bg-primary text-primary-foreground hover:bg-primary/90 h-10 px-4 py-2">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="mr-2 h-4 w-4"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><line x1="19" x2="19" y1="8" y2="14"/><line x1="22" x2="16" y1="11" y2="11"/></svg>
+            Add Member
+        </button>
     </div>
-    
+
     <!-- Members List -->
-    <div class="members-list-card">
-        <h2 class="card-title">Current Members ({{ members|length }})</h2>
-        
-        {% if members %}
-            <div id="membersList">
-                {% for member in members %}
-                    <div class="member-item" data-member-id="{{ member.id }}">
-                        <div class="member-info">
-                            <div class="member-name">
-                                {{ member.user.full_name }}
-                                {% if member.user == group.owner %}
-                                    <span style="color: #dc2626; font-weight: 600;">(Owner)</span>
-                                {% endif %}
+    <div class="rounded-lg border bg-card text-card-foreground shadow-sm">
+        <div class="p-0">
+            <table class="w-full caption-bottom text-sm">
+                <thead class="[&_tr]:border-b">
+                    <tr class="border-b transition-colors hover:bg-muted/50 data-[state=selected]:bg-muted">
+                        <th class="h-12 px-4 text-left align-middle font-medium text-muted-foreground [&:has([role=checkbox])]:pr-0">User</th>
+                        <th class="h-12 px-4 text-left align-middle font-medium text-muted-foreground [&:has([role=checkbox])]:pr-0">Role</th>
+                         <th class="h-12 px-4 text-left align-middle font-medium text-muted-foreground [&:has([role=checkbox])]:pr-0">Joined</th>
+                        <th class="h-12 px-4 text-right align-middle font-medium text-muted-foreground [&:has([role=checkbox])]:pr-0">Actions</th>
+                    </tr>
+                </thead>
+                <tbody class="[&_tr:last-child]:border-0">
+                    {% for membership in members %}
+                    <tr class="border-b transition-colors hover:bg-muted/50 data-[state=selected]:bg-muted">
+                        <td class="p-4 align-middle [&:has([role=checkbox])]:pr-0">
+                            <div class="flex items-center gap-3">
+                                 <div class="flex h-8 w-8 items-center justify-center rounded-full bg-muted">
+                                    <span class="text-xs font-medium uppercase text-muted-foreground">
+                                        {{ membership.user.username|slice:":2" }}
+                                    </span>
+                                </div>
+                                <div>
+                                    <p class="font-medium text-foreground">{{ membership.user.get_full_name|default:membership.user.username }}</p>
+                                    <p class="text-xs text-muted-foreground">{{ membership.user.email }}</p>
+                                </div>
                             </div>
-                            <div class="member-email">{{ member.user.email }}</div>
-                            <div class="member-meta">
-                                <span>Joined: {{ member.joined_at|date:"M d, Y" }}</span>
-                                {% if member.added_by %}
-                                    <span>Added by: {{ member.added_by.full_name }}</span>
-                                {% endif %}
-                            </div>
-                        </div>
-                        
-                        <div class="member-actions">
-                            {% if member.user != group.owner %}
-                                <!-- Role Change -->
-                                <select 
-                                    class="role-select" 
-                                    onchange="changeRole('{{ member.id }}', this.value)"
-                                    data-original-role="{{ member.role }}"
-                                >
-                                    {% for value, label in role_choices %}
-                                        {% if value != 'owner' %}
-                                            <option value="{{ value }}" {% if member.role == value %}selected{% endif %}>
-                                                {{ label }}
-                                            </option>
-                                        {% endif %}
-                                    {% endfor %}
-                                </select>
-                                
-                                <!-- Remove Member -->
-                                <button 
-                                    type="button" 
-                                    class="btn btn-danger btn-small"
-                                    onclick="removeMember('{{ member.id }}', '{{ member.user.full_name }}')"
-                                >
-                                    🗑️ Remove
+                        </td>
+                        <td class="p-4 align-middle [&:has([role=checkbox])]:pr-0">
+                            <span class="inline-flex items-center rounded-full border px-2.5 py-0.5 text-xs font-semibold transition-colors focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 border-transparent bg-secondary text-secondary-foreground hover:bg-secondary/80 capitalize">
+                                {{ membership.role }}
+                            </span>
+                        </td>
+                        <td class="p-4 align-middle [&:has([role=checkbox])]:pr-0 text-muted-foreground">
+                            {{ membership.created_at|date:"M d, Y" }}
+                        </td>
+                        <td class="p-4 align-middle [&:has([role=checkbox])]:pr-0 text-right">
+                            {% if request.user == group.owner and membership.user != request.user %}
+                            <form method="post" action="{% url 'groups:remove_member' group.pk membership.user.pk %}" class="inline-block" onsubmit="return confirm('Are you sure you want to remove this member?');">
+                                {% csrf_token %}
+                                <button type="submit" class="inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 hover:bg-destructive hover:text-destructive-foreground h-8 w-8 text-muted-foreground">
+                                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="h-4 w-4"><path d="M3 6h18"/><path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"/><path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"/></svg>
+                                    <span class="sr-only">Remove</span>
                                 </button>
-                            {% else %}
-                                <span class="role-badge role-owner">Owner</span>
+                            </form>
                             {% endif %}
-                        </div>
-                    </div>
-                {% endfor %}
+                        </td>
+                    </tr>
+                    {% empty %}
+                     <tr>
+                        <td colspan="4" class="p-8 text-center text-muted-foreground">
+                            No members found.
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- Add Member Modal -->
+    <div x-show="showAddMemberModal" style="display: none;" class="fixed inset-0 z-50 flex items-center justify-center bg-black/50" x-transition.opacity>
+         <div class="bg-background rounded-lg shadow-lg w-full max-w-md p-6 relative" @click.outside="showAddMemberModal = false" x-transition.scale>
+            <button @click="showAddMemberModal = false" class="absolute right-4 top-4 rounded-sm opacity-70 ring-offset-background transition-opacity hover:opacity-100 focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 disabled:pointer-events-none data-[state=open]:bg-accent data-[state=open]:text-muted-foreground">
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="h-4 w-4"><line x1="18" x2="6" y1="6" y2="18"></line><line x1="6" x2="18" y1="6" y2="18"></line></svg>
+                <span class="sr-only">Close</span>
+            </button>
+            <div class="flex flex-col space-y-1.5 text-center sm:text-left">
+                <h2 class="text-lg font-semibold leading-none tracking-tight">Add Member</h2>
+                <p class="text-sm text-muted-foreground">Invite a user to join this group.</p>
             </div>
-        {% else %}
-            <div class="empty-members">
-                <div class="empty-icon">👥</div>
-                <div class="empty-title">No members yet</div>
-                <p>Add the first member to start collaborating on this group.</p>
-            </div>
-        {% endif %}
+            
+            <form method="post" action="{% url 'groups:add_member' group.pk %}" class="mt-4 space-y-4">
+                {% csrf_token %}
+                <div class="space-y-2">
+                    <label class="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">Email Address</label>
+                    <input type="email" name="email" required placeholder="user@example.com" class="flex h-10 w-full rounded-md border border-input bg-transparent px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50">
+                </div>
+                 <div class="space-y-2">
+                    <label class="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">Role</label>
+                    <select name="role" class="flex h-10 w-full rounded-md border border-input bg-transparent px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50">
+                        <option value="member">Member</option>
+                        <option value="admin">Admin</option>
+                    </select>
+                </div>
+                <div class="flex justify-end gap-2 mt-6">
+                    <button type="button" @click="showAddMemberModal = false" class="inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 border border-input bg-background hover:bg-accent hover:text-accent-foreground h-10 px-4 py-2">Cancel</button>
+                    <button type="submit" class="inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 bg-primary text-primary-foreground hover:bg-primary/90 h-10 px-4 py-2">Add Member</button>
+                </div>
+            </form>
+        </div>
     </div>
 </div>
-{% endblock %}
-
-{% block extra_js %}
-<script>
-// Add member functionality
-document.getElementById('addMemberForm').addEventListener('submit', function(e) {
-    e.preventDefault();
-    
-    const form = this;
-    const formData = new FormData(form);
-    const messageContainer = document.getElementById('messageContainer');
-    
-    // Clear previous messages
-    messageContainer.innerHTML = '';
-    
-    // Show loading state
-    form.classList.add('loading');
-    
-    fetch(`/groups/ajax/{{ group.id }}/add-member/`, {
-        method: 'POST',
-        body: formData,
-        headers: {
-            'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value,
-        },
-        credentials: 'same-origin'
-    })
-    .then(response => response.json())
-    .then(data => {
-        if (data.success) {
-            // Show success message
-            messageContainer.innerHTML = `
-                <div class="success-message">
-                    Member "${data.member.user_name}" added successfully!
-                </div>
-            `;
-            
-            // Add member to list
-            addMemberToList(data.member);
-            
-            // Reset form
-            form.reset();
-            
-            // Update member count
-            updateMemberCount();
-            
-        } else {
-            // Show error message
-            messageContainer.innerHTML = `
-                <div class="error-message">
-                    ${data.error}
-                </div>
-            `;
-        }
-    })
-    .catch(error => {
-        console.error('Error:', error);
-        messageContainer.innerHTML = `
-            <div class="error-message">
-                An error occurred while adding the member.
-            </div>
-        `;
-    })
-    .finally(() => {
-        form.classList.remove('loading');
-    });
-});
-
-// Add member to DOM
-function addMemberToList(member) {
-    const membersList = document.getElementById('membersList');
-    
-    // If no members list exists, create it
-    if (!membersList) {
-        const membersCard = document.querySelector('.members-list-card');
-        const emptyState = membersCard.querySelector('.empty-members');
-        if (emptyState) {
-            emptyState.remove();
-        }
-        
-        const newList = document.createElement('div');
-        newList.id = 'membersList';
-        membersCard.appendChild(newList);
-    }
-    
-    const memberHtml = `
-        <div class="member-item" data-member-id="${member.id}">
-            <div class="member-info">
-                <div class="member-name">${member.user_name}</div>
-                <div class="member-email">${member.user_email}</div>
-                <div class="member-meta">
-                    <span>Joined: ${member.joined_at}</span>
-                    <span>Added by: {{ user.full_name }}</span>
-                </div>
-            </div>
-            
-            <div class="member-actions">
-                <select 
-                    class="role-select" 
-                    onchange="changeRole('${member.id}', this.value)"
-                    data-original-role="${member.role}"
-                >
-                    {% for value, label in role_choices %}
-                        {% if value != 'owner' %}
-                            <option value="${value}" ${member.role === value ? 'selected' : ''}>
-                                ${value.charAt(0).toUpperCase() + value.slice(1)}
-                            </option>
-                        {% endif %}
-                    {% endfor %}
-                </select>
-                
-                <button 
-                    type="button" 
-                    class="btn btn-danger btn-small"
-                    onclick="removeMember('${member.id}', '${member.user_name}')"
-                >
-                    🗑️ Remove
-                </button>
-            </div>
-        </div>
-    `;
-    
-    document.getElementById('membersList').insertAdjacentHTML('beforeend', memberHtml);
-}
-
-// Change member role
-function changeRole(memberId, newRole) {
-    const selectElement = document.querySelector(`[data-member-id="${memberId}"] .role-select`);
-    const originalRole = selectElement.dataset.originalRole;
-    
-    if (newRole === originalRole) {
-        return; // No change
-    }
-    
-    // Show loading state
-    selectElement.disabled = true;
-    
-    fetch(`/groups/ajax/{{ group.id }}/change-role/${memberId}/`, {
-        method: 'POST',
-        headers: {
-            'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value,
-            'Content-Type': 'application/x-www-form-urlencoded',
-        },
-        body: `role=${newRole}`,
-        credentials: 'same-origin'
-    })
-    .then(response => response.json())
-    .then(data => {
-        if (data.success) {
-            // Update original role
-            selectElement.dataset.originalRole = newRole;
-            
-            // Show success message
-            const messageContainer = document.getElementById('messageContainer');
-            messageContainer.innerHTML = `
-                <div class="success-message">
-                    Member role updated successfully!
-                </div>
-            `;
-            
-            // Clear message after 3 seconds
-            setTimeout(() => {
-                messageContainer.innerHTML = '';
-            }, 3000);
-            
-        } else {
-            // Revert selection
-            selectElement.value = originalRole;
-            
-            // Show error message
-            const messageContainer = document.getElementById('messageContainer');
-            messageContainer.innerHTML = `
-                <div class="error-message">
-                    ${data.error}
-                </div>
-            `;
-        }
-    })
-    .catch(error => {
-        console.error('Error:', error);
-        // Revert selection
-        selectElement.value = originalRole;
-        
-        const messageContainer = document.getElementById('messageContainer');
-        messageContainer.innerHTML = `
-            <div class="error-message">
-                An error occurred while changing the role.
-            </div>
-        `;
-    })
-    .finally(() => {
-        selectElement.disabled = false;
-    });
-}
-
-// Remove member
-function removeMember(memberId, memberName) {
-    if (!confirm(`Are you sure you want to remove "${memberName}" from this group?`)) {
-        return;
-    }
-    
-    const memberElement = document.querySelector(`[data-member-id="${memberId}"]`);
-    memberElement.style.opacity = '0.5';
-    
-    fetch(`/groups/ajax/{{ group.id }}/remove-member/${memberId}/`, {
-        method: 'POST',
-        headers: {
-            'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value,
-        },
-        credentials: 'same-origin'
-    })
-    .then(response => response.json())
-    .then(data => {
-        if (data.success) {
-            // Remove from DOM
-            memberElement.remove();
-            
-            // Update member count
-            updateMemberCount();
-            
-            // Show success message
-            const messageContainer = document.getElementById('messageContainer');
-            messageContainer.innerHTML = `
-                <div class="success-message">
-                    Member "${memberName}" removed successfully!
-                </div>
-            `;
-            
-            // Check if no members left
-            const membersList = document.getElementById('membersList');
-            if (membersList && membersList.children.length === 0) {
-                membersList.remove();
-                
-                const membersCard = document.querySelector('.members-list-card');
-                membersCard.innerHTML += `
-                    <div class="empty-members">
-                        <div class="empty-icon">👥</div>
-                        <div class="empty-title">No members yet</div>
-                        <p>Add the first member to start collaborating on this group.</p>
-                    </div>
-                `;
-            }
-            
-        } else {
-            // Restore opacity
-            memberElement.style.opacity = '1';
-            
-            // Show error message
-            const messageContainer = document.getElementById('messageContainer');
-            messageContainer.innerHTML = `
-                <div class="error-message">
-                    ${data.error}
-                </div>
-            `;
-        }
-    })
-    .catch(error => {
-        console.error('Error:', error);
-        // Restore opacity
-        memberElement.style.opacity = '1';
-        
-        const messageContainer = document.getElementById('messageContainer');
-        messageContainer.innerHTML = `
-            <div class="error-message">
-                An error occurred while removing the member.
-            </div>
-        `;
-    });
-}
-
-// Update member count in title
-function updateMemberCount() {
-    const membersList = document.getElementById('membersList');
-    const count = membersList ? membersList.children.length : 0;
-    const title = document.querySelector('.members-list-card .card-title');
-    title.textContent = `Current Members (${count})`;
-}
-
-// Clear messages after 5 seconds
-setInterval(() => {
-    const messageContainer = document.getElementById('messageContainer');
-    if (messageContainer.innerHTML) {
-        setTimeout(() => {
-            messageContainer.innerHTML = '';
-        }, 5000);
-    }
-}, 1000);
-</script>
 {% endblock %}

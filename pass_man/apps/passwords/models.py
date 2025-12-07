@@ -108,15 +108,15 @@ class Password(BaseModel):
         help_text="Group that owns this password"
     )
     
-    # Directory relationship (to be implemented in Epic 5)
-    # directory = models.ForeignKey(
-    #     'directories.Directory',
-    #     on_delete=models.SET_NULL,
-    #     null=True,
-    #     blank=True,
-    #     related_name='passwords',
-    #     help_text="Directory for organization (to be implemented in Epic 5)"
-    # )
+    # Directory relationship
+    directory = models.ForeignKey(
+        'directories.Directory',
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name='passwords',
+        help_text="Directory for organization"
+    )
     
     created_by = models.ForeignKey(
         User,

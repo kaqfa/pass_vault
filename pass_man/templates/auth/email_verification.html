@@ -1,200 +1,122 @@
-{% extends 'base.html' %}
+{% extends "base.html" %}
 
-{% block title %}Email Verification - Pass-Man{% endblock %}
-
-{% block extra_css %}
-<style>
-    .verification-container {
-        min-height: 70vh;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
-    }
-    
-    .verification-card {
-        background: white;
-        border-radius: 12px;
-        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
-        padding: 3rem 2rem;
-        width: 100%;
-        max-width: 500px;
-        text-align: center;
-    }
-    
-    .verification-icon {
-        font-size: 4rem;
-        margin-bottom: 1.5rem;
-    }
-    
-    .verification-icon.success {
-        color: #10b981;
-    }
-    
-    .verification-icon.error {
-        color: #ef4444;
-    }
-    
-    .verification-title {
-        font-size: 1.875rem;
-        font-weight: bold;
-        margin-bottom: 1rem;
-    }
-    
-    .verification-title.success {
-        color: #065f46;
-    }
-    
-    .verification-title.error {
-        color: #991b1b;
-    }
-    
-    .verification-message {
-        color: #6b7280;
-        font-size: 1.125rem;
-        line-height: 1.6;
-        margin-bottom: 2rem;
-    }
-    
-    .btn-primary {
-        background: linear-gradient(135deg, #3b82f6, #1d4ed8);
-        color: white;
-        border: none;
-        padding: 0.875rem 2rem;
-        border-radius: 8px;
-        font-size: 1rem;
-        font-weight: 600;
-        text-decoration: none;
-        display: inline-block;
-        transition: transform 0.2s, box-shadow 0.2s;
-        margin: 0.5rem;
-    }
-    
-    .btn-primary:hover {
-        transform: translateY(-1px);
-        box-shadow: 0 4px 12px rgba(59, 130, 246, 0.4);
-        color: white;
-        text-decoration: none;
-    }
-    
-    .btn-secondary {
-        background: #f3f4f6;
-        color: #374151;
-        border: 2px solid #d1d5db;
-        padding: 0.875rem 2rem;
-        border-radius: 8px;
-        font-size: 1rem;
-        font-weight: 600;
-        text-decoration: none;
-        display: inline-block;
-        transition: all 0.2s;
-        margin: 0.5rem;
-    }
-    
-    .btn-secondary:hover {
-        background: #e5e7eb;
-        border-color: #9ca3af;
-        color: #374151;
-        text-decoration: none;
-    }
-    
-    .verification-steps {
-        background: #f8f9fa;
-        border-radius: 8px;
-        padding: 1.5rem;
-        margin-top: 2rem;
-        text-align: left;
-    }
-    
-    .verification-steps h4 {
-        color: #374151;
-        font-weight: 600;
-        margin-bottom: 1rem;
-    }
-    
-    .verification-steps ol {
-        color: #6b7280;
-        padding-left: 1.5rem;
-    }
-    
-    .verification-steps li {
-        margin-bottom: 0.5rem;
-    }
-</style>
-{% endblock %}
+{% block title %}Verify Email - Pass-Man{% endblock %}
 
 {% block content %}
-<div class="verification-container">
-    <div class="verification-card">
-        {% if success %}
-            <!-- Success State -->
-            <div class="verification-icon success">✅</div>
-            <h1 class="verification-title success">Email Verified Successfully!</h1>
-            <p class="verification-message">
-                Great! Your email address has been verified and your account is now active. 
-                You can now sign in and start using Pass-Man to secure your passwords.
-            </p>
-            
-            <div class="mt-4">
-                <a href="{% url 'users:login' %}" class="btn-primary">
-                    Sign In to Your Account
-                </a>
-                <a href="{% url 'core:home' %}" class="btn-secondary">
-                    Back to Home
-                </a>
+<div class="min-h-screen flex items-center justify-center p-8">
+    <div class="w-full max-w-md">
+        <div class="text-center mb-8">
+            <sl-icon name="mail-unread" style="font-size: 4rem; color: var(--sl-color-primary-600);"></sl-icon>
+        </div>
+
+        <sl-card class="w-full">
+            <div slot="header">
+                <h2 class="text-xl font-semibold">Verify Your Email</h2>
+                <p class="text-sm text-gray-500 mt-1">We've sent a verification link to your email</p>
             </div>
-            
-            <div class="verification-steps">
-                <h4>What's Next?</h4>
-                <ol>
-                    <li>Sign in with your email and password</li>
-                    <li>Create your first password group</li>
-                    <li>Start adding and organizing your passwords</li>
-                    <li>Invite team members to collaborate</li>
-                </ol>
+
+            <div class="text-center space-y-4">
+                <div class="p-4 bg-primary-50 rounded-lg">
+                    <p class="text-lg font-medium text-primary-900">{{ user.email }}</p>
+                    <p class="text-sm text-primary-700 mt-1">Check your inbox and click the verification link</p>
+                </div>
+
+                <div class="space-y-2 text-sm text-gray-600">
+                    <p>Didn't receive the email?</p>
+                    <ul class="text-left space-y-1 ml-4">
+                        <li>• Check your spam/junk folder</li>
+                        <li>• Make sure the email address is correct</li>
+                        <li>• Wait a few minutes for delivery</li>
+                    </ul>
+                </div>
+
+                {% if messages %}
+                    {% for message in messages %}
+                        <sl-alert type="{% if message.tags == 'error' %}danger{% else %}success{% endif %}" open>
+                            <sl-icon name="{% if message.tags == 'error' %}exclamation-triangle{% else %}check-circle{% endif %}" slot="icon"></sl-icon>
+                            {{ message }}
+                        </sl-alert>
+                    {% endfor %}
+                {% endif %}
+
+                <form method="post" action="{% url 'users:resend_verification' %}" class="pt-4">
+                    {% csrf_token %}
+                    <sl-button type="submit" variant="default" outline>
+                        <sl-icon name="refresh" slot="prefix"></sl-icon>
+                        Resend Verification Email
+                    </sl-button>
+                </form>
             </div>
-            
-        {% else %}
-            <!-- Error State -->
-            <div class="verification-icon error">❌</div>
-            <h1 class="verification-title error">Verification Failed</h1>
-            <p class="verification-message">
-                The email verification link is invalid, expired, or has already been used. 
-                This could happen if the link is older than 24 hours or if you've already verified your email.
-            </p>
-            
-            <div class="mt-4">
-                <a href="{% url 'users:login' %}" class="btn-primary">
-                    Try Signing In
-                </a>
-                <a href="{% url 'users:register' %}" class="btn-secondary">
-                    Create New Account
-                </a>
+
+            <div slot="footer">
+                <div class="text-center space-y-2">
+                    <p class="text-sm text-gray-500">
+                        Already verified?
+                        <a href="{% url 'users:login' %}" class="text-primary-600 hover:text-primary-700 font-medium">Sign In</a>
+                    </p>
+                    <p class="text-sm text-gray-500">
+                        Wrong email?
+                        <a href="{% url 'users:logout' %}" class="text-primary-600 hover:text-primary-700">Sign Out</a>
+                    </p>
+                </div>
             </div>
-            
-            <div class="verification-steps">
-                <h4>What You Can Do:</h4>
-                <ol>
-                    <li>Try signing in if you think your email is already verified</li>
-                    <li>Check your email for a more recent verification link</li>
-                    <li>Create a new account if needed</li>
-                    <li>Contact support if you continue having issues</li>
-                </ol>
-            </div>
-        {% endif %}
+        </sl-card>
+
+        <!-- Auto-refresh checker -->
+        <div x-data="{
+            checkVerified: false,
+            intervalId: null,
+
+            init() {
+                // Check verification status every 30 seconds
+                this.intervalId = setInterval(async () => {
+                    try {
+                        const response = await fetch('{% url "users:check_verification" %}', {
+                            method: 'GET',
+                            headers: {
+                                'X-Requested-With': 'XMLHttpRequest'
+                            }
+                        });
+
+                        if (response.ok) {
+                            const data = await response.json();
+                            if (data.verified) {
+                                showToast('Email verified successfully! Redirecting...', 'success');
+                                setTimeout(() => {
+                                    window.location.href = '{% url "users:login" %}';
+                                }, 1500);
+                            }
+                        }
+                    } catch (error) {
+                        // Silently fail
+                    }
+                }, 30000);
+            },
+
+            destroy() {
+                if (this.intervalId) {
+                    clearInterval(this.intervalId);
+                }
+            }
+        }" x-init="init()" x-on:unload="destroy()"></div>
     </div>
 </div>
-{% endblock %}
 
-{% block extra_js %}
-{% if success %}
-<script>
-document.addEventListener('DOMContentLoaded', function() {
-    // Auto-redirect to login after successful verification (optional)
-    // setTimeout(function() {
-    //     window.location.href = "{% url 'users:login' %}";
-    // }, 5000);
-});
-</script>
-{% endif %}
+<style>
+    .space-y-1 > * + * {
+        margin-top: var(--sl-spacing-x-small);
+    }
+
+    .space-y-2 > * + * {
+        margin-top: var(--sl-spacing-small);
+    }
+
+    .space-y-4 > * + * {
+        margin-top: var(--sl-spacing-medium);
+    }
+
+    .bg-primary-50 { background-color: var(--sl-color-primary-50); }
+    .text-primary-700 { color: var(--sl-color-primary-700); }
+    .text-primary-900 { color: var(--sl-color-primary-900); }
+</style>
 {% endblock %}

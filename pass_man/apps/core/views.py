@@ -79,15 +79,55 @@ class DashboardView(LoginRequiredMixin, BaseView):
         """Add dashboard specific context data."""
         context = super().get_context_data(**kwargs)
         
-        # Add user statistics
         user = self.request.user
+        
+        # 1. Fetch User Stats
+        total_passwords = user.created_passwords.filter(is_deleted=False).count()
+        # TODO: Implement shared passwords count when sharing feature is ready
+        shared_passwords = 0 
+        groups_count = user.get_user_groups().count()
+        
+        # 2. Fetch Recent Passwords (last 5 accessed or updated)
+        # using created_passwords as the source for now
+        recent_passwords = (
+            user.created_passwords
+            .filter(is_deleted=False)
+            .select_related('group')
+            .order_by('-updated_at')[:5]
+        )
+        
+        # 3. Fetch Recent Activity (PasswordAccessLog)
+        # Ensure we import the model inside the method or at top level if possible
+        # To avoid circular imports, doing lazy import if needed, but here it should be fine if imported at top
+        from apps.passwords.models import PasswordAccessLog
+        
+        # Get logs where the user accessed a password
+        recent_activity = (
+            PasswordAccessLog.objects
+            .filter(user=user)
+            .select_related('password', 'password__group')
+            .order_by('-accessed_at')[:10]
+        )
+
+        # 4. Password Health (Simple stub for now, or real calculation)
+        # Real calculation:
+        weak_passwords = 0
+        medium_passwords = 0
+        strong_passwords = 0
+        # Since we can't easily decrypt all passwords to check strength efficiently in SQL,
+        # we might rely on a 'strength' field if we had one, or just show total for now.
+        # The Password model has 'priority', but not strength.
+        # We'll just define generic stats for the UI to render if needed, or omit.
+        
         context.update({
             'page_title': 'Dashboard',
             'user_stats': {
-                'total_passwords': 0,  # TODO: Implement in Epic 4
-                'shared_passwords': 0,  # TODO: Implement in Epic 3
-                'groups_count': user.get_user_groups().count(),
-            }
+                'total_passwords': total_passwords,
+                'shared_passwords': shared_passwords,
+                'groups_count': groups_count,
+            },
+            'recent_passwords': recent_passwords,
+            'recent_activity': recent_activity,
         })
         
         return context

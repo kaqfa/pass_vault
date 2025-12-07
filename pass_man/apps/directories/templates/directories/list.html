@@ -1,0 +1,79 @@
+{% extends 'base.html' %}
+
+{% block title %}Directories - Pass-Man{% endblock %}
+
+{% block content %}
+<div class="sm:flex sm:items-center">
+    <div class="sm:flex-auto">
+        <h1 class="text-2xl font-semibold leading-6 text-gray-900">Directories</h1>
+        <p class="mt-2 text-sm text-gray-700">Organize your passwords with hierarchical directories.</p>
+    </div>
+    <div class="mt-4 sm:ml-16 sm:mt-0 sm:flex-none">
+        <button type="button" class="block rounded-md bg-primary-600 px-3 py-2 text-center text-sm font-semibold text-white shadow-sm hover:bg-primary-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary-600">
+            Add Directory
+        </button>
+    </div>
+</div>
+
+<div class="mt-8 flow-root">
+    <div class="-mx-4 -my-2 overflow-x-auto sm:-mx-6 lg:-mx-8">
+        <div class="inline-block min-w-full py-2 align-middle sm:px-6 lg:px-8">
+            <div class="overflow-hidden shadow ring-1 ring-black ring-opacity-5 sm:rounded-lg">
+                <div class="bg-white p-6 text-center text-gray-500" id="directory-loading">
+                    Loading directories...
+                </div>
+                <div id="directory-tree" class="bg-white p-4 hidden">
+                    <!-- Directory tree will be rendered here by JavaScript -->
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    fetch('/directories/api/tree/')
+        .then(response => response.json())
+        .then(data => {
+            const container = document.getElementById('directory-tree');
+            const loading = document.getElementById('directory-loading');
+            
+            if (data.length === 0) {
+                container.innerHTML = '<p class="text-center text-gray-500">No directories found.</p>';
+            } else {
+                container.innerHTML = renderTree(data);
+            }
+            
+            loading.classList.add('hidden');
+            container.classList.remove('hidden');
+        })
+        .catch(error => {
+            console.error('Error fetching directories:', error);
+            document.getElementById('directory-loading').innerText = 'Error loading directories.';
+        });
+});
+
+function renderTree(nodes, level = 0) {
+    let html = '<ul class="space-y-2">';
+    nodes.forEach(node => {
+        const padding = level * 1.5;
+        html += `
+            <li>
+                <div class="flex items-center group hover:bg-gray-50 rounded-md p-2" style="padding-left: ${padding}rem">
+                    <svg class="h-5 w-5 text-gray-400 mr-2" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M2.25 12.75V12A2.25 2.25 0 014.5 9.75h15A2.25 2.25 0 0121.75 12v.75m-8.69-6.44l-2.12-2.12a1.5 1.5 0 00-1.061-.44H4.5A2.25 2.25 0 002.25 6v12a2.25 2.25 0 002.25 2.25h15A2.25 2.25 0 0021.75 18V9a2.25 2.25 0 00-2.25-2.25h-5.379a1.5 1.5 0 01-1.06-.44z" />
+                    </svg>
+                    <span class="text-sm font-medium text-gray-900">${node.name}</span>
+                    <span class="ml-2 text-xs text-gray-500">${node.description || ''}</span>
+                </div>
+                ${node.children && node.children.length > 0 ? renderTree(node.children, level + 1) : ''}
+            </li>
+        `;
+    });
+    html += '</ul>';
+    return html;
+}
+</script>
+{% endblock %}

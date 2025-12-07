@@ -49,11 +49,11 @@ class PasswordListView(LoginRequiredMixin, BaseView):
     def get(self, request):
         """Display password list with search and filters."""
         try:
-            # Get search parameters
             query = request.GET.get('q', '').strip()
             group_id = request.GET.get('group')
             priority = request.GET.get('priority')
             is_favorite = request.GET.get('favorite')
+            tag_filter = request.GET.get('tag')
             
             # Build filters
             filters = {}
@@ -63,6 +63,8 @@ class PasswordListView(LoginRequiredMixin, BaseView):
                 filters['priority'] = priority
             if is_favorite:
                 filters['is_favorite'] = is_favorite == 'true'
+            if tag_filter:
+                filters['tags__contains'] = tag_filter
             
             # Get passwords
             if query or filters:
@@ -79,16 +81,25 @@ class PasswordListView(LoginRequiredMixin, BaseView):
             user_groups = Group.objects.filter(
                 Q(owner=request.user) | Q(usergroup__user=request.user)
             ).distinct()
+
+            # Get all unique tags for the user (naive implementation, optimize for large datasets)
+            # Fetch all tags from user's passwords
+            all_tags_nested = Password.objects.filter(created_by=request.user).values_list('tags', flat=True)
+            unique_tags = sorted(list(set(
+                tag for tags in all_tags_nested if tags for tag in tags
+            )))
             
             context = {
                 'page_title': 'My Passwords',
                 'passwords': page_obj,
                 'user_groups': user_groups,
+                'unique_tags': unique_tags,
                 'search_query': query,
                 'current_filters': {
                     'group': group_id,
                     'priority': priority,
-                    'favorite': is_favorite
+                    'favorite': is_favorite,
+                    'tag': tag_filter
                 },
                 'priority_choices': Password.Priority.choices,
                 'total_count': len(passwords)
@@ -161,7 +172,9 @@ class PasswordCreateView(LoginRequiredMixin, BaseView):
             'page_title': 'Add New Password',
             'user_groups': user_groups,
             'priority_choices': Password.Priority.choices,
-            'is_create': True
+            'is_create': True,
+            'form_data': {},
+            'password': None
         }
         
         return render(request, self.template_name, context)
@@ -204,7 +217,9 @@ class PasswordCreateView(LoginRequiredMixin, BaseView):
                 'priority_choices': Password.Priority.choices,
                 'is_create': True,
                 'errors': e.details,
-                'form_data': password_data
+                'form_data': password_data,
+                'custom_fields_str': json.dumps(password_data.get('custom_fields', {})),
+                'tags_str': request.POST.get('tags', '')
             }
             
             return render(request, self.template_name, context)
@@ -265,7 +280,8 @@ class PasswordEditView(LoginRequiredMixin, BaseView):
                 'priority_choices': Password.Priority.choices,
                 'is_create': False,
                 'tags_str': ', '.join(password.tags) if password.tags else '',
-                'custom_fields_str': json.dumps(password.custom_fields) if password.custom_fields else '{}'
+                'custom_fields_str': json.dumps(password.custom_fields) if password.custom_fields else '{}',
+                'form_data': {}
             }
             
             return render(request, self.template_name, context)
@@ -322,7 +338,9 @@ class PasswordEditView(LoginRequiredMixin, BaseView):
                     'priority_choices': Password.Priority.choices,
                     'is_create': False,
                     'errors': e.details,
-                    'form_data': password_data
+                    'form_data': password_data,
+                    'custom_fields_str': json.dumps(password_data.get('custom_fields', {})),
+                    'tags_str': request.POST.get('tags', '')
                 }
                 
                 return render(request, self.template_name, context)

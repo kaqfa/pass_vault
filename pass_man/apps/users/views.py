@@ -180,8 +180,8 @@ class UserLogoutView(LoginRequiredMixin, View):
         return redirect('core:home')
     
     def get(self, request):
-        """Redirect GET requests to POST for security."""
-        return redirect('core:home')
+        """Handle logout via GET request."""
+        return self.post(request)
 
 
 class EmailVerificationView(BaseView):

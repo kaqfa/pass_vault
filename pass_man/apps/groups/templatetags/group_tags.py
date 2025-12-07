@@ -1,4 +1,5 @@
 from django import template
+# Force reload
 from apps.groups.models import UserGroup
 
 register = template.Library()

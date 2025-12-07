@@ -1,0 +1,617 @@
+[
+{
+  "model": "directories.directory",
+  "pk": "047a8ef8-82a3-4e6e-989a-1c49734028cf",
+  "fields": {
+    "created_at": "2025-12-03T15:22:07.616Z",
+    "updated_at": "2025-12-03T15:22:07.616Z",
+    "is_deleted": false,
+    "deleted_at": null,
+    "name": "Brand Folder",
+    "description": "Synergized bi-directional neural-net",
+    "parent": null,
+    "group": "1f4d57f3-2980-4b38-8ba9-438e3b5ad849",
+    "created_by": "9711f46b-8065-496a-b901-d4fc14d2161e"
+  }
+},
+{
+  "model": "directories.directory",
+  "pk": "06a2c6ab-7ec9-4316-b719-23defc3325fe",
+  "fields": {
+    "created_at": "2025-12-03T15:22:07.689Z",
+    "updated_at": "2025-12-03T15:22:07.689Z",
+    "is_deleted": false,
+    "deleted_at": null,
+    "name": "Synthesize Subfolder",
+    "description": "Exclusive maximized success",
+    "parent": "94e3f039-8363-4fd5-ab97-00ce8db411a5",
+    "group": "23c4bb97-853d-43ca-baa0-85f87bd012d3",
+    "created_by": "17dd481e-96c3-43f1-b9b8-46a30021117d"
+  }
+},
+{
+  "model": "directories.directory",
+  "pk": "091752d6-284d-47f8-976b-40ae280fcf80",
+  "fields": {
+    "created_at": "2025-12-03T15:22:07.584Z",
+    "updated_at": "2025-12-03T15:22:07.584Z",
+    "is_deleted": false,
+    "deleted_at": null,
+    "name": "Leverage Folder",
+    "description": "Cloned context-sensitive emulation",
+    "parent": null,
+    "group": "11075f5f-aa81-49c1-ba82-0626f76564cc",
+    "created_by": "304a698b-0fd6-400b-85b5-ddf63cea4753"
+  }
+},
+{
+  "model": "directories.directory",
+  "pk": "0d2d1956-e67d-431a-a32b-78f5e377e873",
+  "fields": {
+    "created_at": "2025-12-03T15:22:07.596Z",
+    "updated_at": "2025-12-03T15:22:07.596Z",
+    "is_deleted": false,
+    "deleted_at": null,
+    "name": "Reinvent Subfolder",
+    "description": "Team-oriented attitude-oriented customer loyalty",
+    "parent": "dde5927a-68bc-480b-86d5-02442db80d31",
+    "group": "59175099-ae4b-4bbf-bec1-0c23a0c8f272",
+    "created_by": "7b1a8a60-2f9f-4af8-89f5-5e3db1007596"
+  }
+},
+{
+  "model": "directories.directory",
+  "pk": "0e4eec13-f708-4d8a-81ce-9c355119a45c",
+  "fields": {
+    "created_at": "2025-12-03T15:22:07.582Z",
+    "updated_at": "2025-12-03T15:22:07.582Z",
+    "is_deleted": false,
+    "deleted_at": null,
+    "name": "Transform Subfolder",
+    "description": "Future-proofed systemic hierarchy",
+    "parent": "2b767ae1-75f3-4056-aad2-7a97aab9c444",
+    "group": "11075f5f-aa81-49c1-ba82-0626f76564cc",
+    "created_by": "304a698b-0fd6-400b-85b5-ddf63cea4753"
+  }
+},
+{
+  "model": "directories.directory",
+  "pk": "14697399-39a1-40a1-866b-7b29e41380d7",
+  "fields": {
+    "created_at": "2025-12-03T15:22:07.708Z",
+    "updated_at": "2025-12-03T15:22:07.708Z",
+    "is_deleted": false,
+    "deleted_at": null,
+    "name": "Enable Subfolder",
+    "description": "Stand-alone optimal portal",
+    "parent": "81c471ed-dd66-468f-9a7c-f5ab495b66d4",
+    "group": "a6add9c4-f183-4f3b-9ffc-d5663e5290fa",
+    "created_by": "17dd481e-96c3-43f1-b9b8-46a30021117d"
+  }
+},
+{
+  "model": "directories.directory",
+  "pk": "18ac1d56-ca52-4262-b1d7-d74cc49a0112",
+  "fields": {
+    "created_at": "2025-12-03T15:22:07.661Z",
+    "updated_at": "2025-12-03T15:22:07.661Z",
+    "is_deleted": false,
+    "deleted_at": null,
+    "name": "Visualize Subfolder",
+    "description": "Business-focused methodical database",
+    "parent": "d3e01d4c-4d9c-4a37-a041-1f4da2c921c7",
+    "group": "617ef5f5-6a0e-4e75-9af8-833611e7af95",
+    "created_by": "74f181b2-822a-4d6f-8a95-4e93279e99fa"
+  }
+},
+{
+  "model": "directories.directory",
+  "pk": "1949c5bb-6361-4fad-99ab-631ab555a15d",
+  "fields": {
+    "created_at": "2025-12-03T15:22:07.624Z",
+    "updated_at": "2025-12-03T15:22:07.624Z",
+    "is_deleted": false,
+    "deleted_at": null,
+    "name": "Incentivize Subfolder",
+    "description": "Total non-volatile Local Area Network",
+    "parent": "047a8ef8-82a3-4e6e-989a-1c49734028cf",
+    "group": "1f4d57f3-2980-4b38-8ba9-438e3b5ad849",
+    "created_by": "9711f46b-8065-496a-b901-d4fc14d2161e"
+  }
+},
+{
+  "model": "directories.directory",
+  "pk": "25a99d28-a765-4cc1-9cae-5d1dd0b13fc1",
+  "fields": {
+    "created_at": "2025-12-03T15:22:07.602Z",
+    "updated_at": "2025-12-03T15:22:07.602Z",
+    "is_deleted": false,
+    "deleted_at": null,
+    "name": "Revolutionize Folder",
+    "description": "Optional content-based framework",
+    "parent": null,
+    "group": "85b06970-a022-46c0-8c62-58c1ce3eaf5b",
+    "created_by": "54d73d0e-3094-4f89-bd06-d729fc2be9fa"
+  }
+},
+{
+  "model": "directories.directory",
+  "pk": "29887968-a66c-4861-a750-3968c3b24b4c",
+  "fields": {
+    "created_at": "2025-12-03T15:22:07.712Z",
+    "updated_at": "2025-12-03T15:22:07.712Z",
+    "is_deleted": false,
+    "deleted_at": null,
+    "name": "Engage Folder",
+    "description": "Front-line methodical knowledge user",
+    "parent": null,
+    "group": "746ec4fb-a136-46c4-a4ca-6e7ffb3a2540",
+    "created_by": "65a42ce2-d883-4caa-bf05-fc63ea17ac7e"
+  }
+},
+{
+  "model": "directories.directory",
+  "pk": "2b767ae1-75f3-4056-aad2-7a97aab9c444",
+  "fields": {
+    "created_at": "2025-12-03T15:22:07.575Z",
+    "updated_at": "2025-12-03T15:22:07.575Z",
+    "is_deleted": false,
+    "deleted_at": null,
+    "name": "Integrate Folder",
+    "description": "Focused mobile software",
+    "parent": null,
+    "group": "11075f5f-aa81-49c1-ba82-0626f76564cc",
+    "created_by": "304a698b-0fd6-400b-85b5-ddf63cea4753"
+  }
+},
+{
+  "model": "directories.directory",
+  "pk": "34908025-4dec-4c86-8534-53a7e44e1c93",
+  "fields": {
+    "created_at": "2025-12-03T15:22:07.683Z",
+    "updated_at": "2025-12-03T15:22:07.683Z",
+    "is_deleted": false,
+    "deleted_at": null,
+    "name": "Deploy Folder",
+    "description": "Vision-oriented human-resource conglomeration",
+    "parent": null,
+    "group": "23c4bb97-853d-43ca-baa0-85f87bd012d3",
+    "created_by": "17dd481e-96c3-43f1-b9b8-46a30021117d"
+  }
+},
+{
+  "model": "directories.directory",
+  "pk": "3a03967d-9e24-4edd-a376-ab00ca8bafdd",
+  "fields": {
+    "created_at": "2025-12-03T15:22:07.634Z",
+    "updated_at": "2025-12-03T15:22:07.634Z",
+    "is_deleted": false,
+    "deleted_at": null,
+    "name": "Redefine Subfolder",
+    "description": "Secured context-sensitive contingency",
+    "parent": "047a8ef8-82a3-4e6e-989a-1c49734028cf",
+    "group": "1f4d57f3-2980-4b38-8ba9-438e3b5ad849",
+    "created_by": "9711f46b-8065-496a-b901-d4fc14d2161e"
+  }
+},
+{
+  "model": "directories.directory",
+  "pk": "3c19a8fb-82fe-4d3b-abf1-54e20edb7997",
+  "fields": {
+    "created_at": "2025-12-03T15:22:07.669Z",
+    "updated_at": "2025-12-03T15:22:07.669Z",
+    "is_deleted": false,
+    "deleted_at": null,
+    "name": "Deploy Folder",
+    "description": "Customer-focused content-based parallelism",
+    "parent": null,
+    "group": "0d35f8ec-503d-483e-bcd5-6f1acf2c5d1a",
+    "created_by": "98c24c25-5d8c-4338-9977-8e56fd89342c"
+  }
+},
+{
+  "model": "directories.directory",
+  "pk": "43ac28a3-597e-456c-9b06-db8e299ac101",
+  "fields": {
+    "created_at": "2025-12-03T15:22:07.710Z",
+    "updated_at": "2025-12-03T15:22:07.710Z",
+    "is_deleted": false,
+    "deleted_at": null,
+    "name": "Leverage Folder",
+    "description": "Extended transitional leverage",
+    "parent": null,
+    "group": "746ec4fb-a136-46c4-a4ca-6e7ffb3a2540",
+    "created_by": "65a42ce2-d883-4caa-bf05-fc63ea17ac7e"
+  }
+},
+{
+  "model": "directories.directory",
+  "pk": "61b96590-6a04-4a52-92ec-11b65302259a",
+  "fields": {
+    "created_at": "2025-12-03T15:22:07.693Z",
+    "updated_at": "2025-12-03T15:22:07.693Z",
+    "is_deleted": false,
+    "deleted_at": null,
+    "name": "Reinvent Subfolder",
+    "description": "Intuitive bifurcated project",
+    "parent": "94e3f039-8363-4fd5-ab97-00ce8db411a5",
+    "group": "23c4bb97-853d-43ca-baa0-85f87bd012d3",
+    "created_by": "17dd481e-96c3-43f1-b9b8-46a30021117d"
+  }
+},
+{
+  "model": "directories.directory",
+  "pk": "620ef980-7f9f-47d4-93c2-90ab0f64df31",
+  "fields": {
+    "created_at": "2025-12-03T15:22:07.715Z",
+    "updated_at": "2025-12-03T15:22:07.715Z",
+    "is_deleted": false,
+    "deleted_at": null,
+    "name": "Architect Subfolder",
+    "description": "Polarized tertiary encoding",
+    "parent": "29887968-a66c-4861-a750-3968c3b24b4c",
+    "group": "746ec4fb-a136-46c4-a4ca-6e7ffb3a2540",
+    "created_by": "65a42ce2-d883-4caa-bf05-fc63ea17ac7e"
+  }
+},
+{
+  "model": "directories.directory",
+  "pk": "71b98b89-a327-4f1b-85bc-3635cb7509a1",
+  "fields": {
+    "created_at": "2025-12-03T15:22:07.667Z",
+    "updated_at": "2025-12-03T15:22:07.667Z",
+    "is_deleted": false,
+    "deleted_at": null,
+    "name": "Cultivate Subfolder",
+    "description": "Multi-tiered hybrid flexibility",
+    "parent": "f9573125-989f-49a9-822e-fdfd0805e248",
+    "group": "74d3192a-2d96-4159-8dc0-f0e316d029e0",
+    "created_by": "54d73d0e-3094-4f89-bd06-d729fc2be9fa"
+  }
+},
+{
+  "model": "directories.directory",
+  "pk": "73f3c96c-c55a-4871-8f91-736cbca81ecc",
+  "fields": {
+    "created_at": "2025-12-03T15:22:07.589Z",
+    "updated_at": "2025-12-03T15:22:07.589Z",
+    "is_deleted": false,
+    "deleted_at": null,
+    "name": "Target Subfolder",
+    "description": "Front-line scalable open system",
+    "parent": "091752d6-284d-47f8-976b-40ae280fcf80",
+    "group": "11075f5f-aa81-49c1-ba82-0626f76564cc",
+    "created_by": "304a698b-0fd6-400b-85b5-ddf63cea4753"
+  }
+},
+{
+  "model": "directories.directory",
+  "pk": "81c471ed-dd66-468f-9a7c-f5ab495b66d4",
+  "fields": {
+    "created_at": "2025-12-03T15:22:07.701Z",
+    "updated_at": "2025-12-03T15:22:07.701Z",
+    "is_deleted": false,
+    "deleted_at": null,
+    "name": "Strategize Folder",
+    "description": "Synchronized systemic system engine",
+    "parent": null,
+    "group": "a6add9c4-f183-4f3b-9ffc-d5663e5290fa",
+    "created_by": "17dd481e-96c3-43f1-b9b8-46a30021117d"
+  }
+},
+{
+  "model": "directories.directory",
+  "pk": "87b2f0c3-12ba-4197-b998-456e8d086872",
+  "fields": {
+    "created_at": "2025-12-03T15:22:07.682Z",
+    "updated_at": "2025-12-03T15:22:07.682Z",
+    "is_deleted": false,
+    "deleted_at": null,
+    "name": "Orchestrate Subfolder",
+    "description": "Cloned scalable Internet solution",
+    "parent": "985907ca-7d99-4bce-b8f0-b418b16432f8",
+    "group": "0d35f8ec-503d-483e-bcd5-6f1acf2c5d1a",
+    "created_by": "98c24c25-5d8c-4338-9977-8e56fd89342c"
+  }
+},
+{
+  "model": "directories.directory",
+  "pk": "8889caab-48ed-4f6e-8744-8c1874a9c31e",
+  "fields": {
+    "created_at": "2025-12-03T15:22:07.645Z",
+    "updated_at": "2025-12-03T15:22:07.645Z",
+    "is_deleted": false,
+    "deleted_at": null,
+    "name": "Implement Subfolder",
+    "description": "Expanded non-volatile Local Area Network",
+    "parent": "e3e678cb-e553-4101-821c-2bf1e8e0747b",
+    "group": "1f4d57f3-2980-4b38-8ba9-438e3b5ad849",
+    "created_by": "9711f46b-8065-496a-b901-d4fc14d2161e"
+  }
+},
+{
+  "model": "directories.directory",
+  "pk": "88fc2b9e-827d-48ea-8ae9-4d3d637168e2",
+  "fields": {
+    "created_at": "2025-12-03T15:22:07.676Z",
+    "updated_at": "2025-12-03T15:22:07.676Z",
+    "is_deleted": false,
+    "deleted_at": null,
+    "name": "Matrix Subfolder",
+    "description": "Polarized background functionalities",
+    "parent": "3c19a8fb-82fe-4d3b-abf1-54e20edb7997",
+    "group": "0d35f8ec-503d-483e-bcd5-6f1acf2c5d1a",
+    "created_by": "98c24c25-5d8c-4338-9977-8e56fd89342c"
+  }
+},
+{
+  "model": "directories.directory",
+  "pk": "94e3f039-8363-4fd5-ab97-00ce8db411a5",
+  "fields": {
+    "created_at": "2025-12-03T15:22:07.686Z",
+    "updated_at": "2025-12-03T15:22:07.686Z",
+    "is_deleted": false,
+    "deleted_at": null,
+    "name": "Syndicate Folder",
+    "description": "Streamlined real-time access",
+    "parent": null,
+    "group": "23c4bb97-853d-43ca-baa0-85f87bd012d3",
+    "created_by": "17dd481e-96c3-43f1-b9b8-46a30021117d"
+  }
+},
+{
+  "model": "directories.directory",
+  "pk": "985907ca-7d99-4bce-b8f0-b418b16432f8",
+  "fields": {
+    "created_at": "2025-12-03T15:22:07.678Z",
+    "updated_at": "2025-12-03T15:22:07.678Z",
+    "is_deleted": false,
+    "deleted_at": null,
+    "name": "Architect Folder",
+    "description": "Automated 24hour encoding",
+    "parent": null,
+    "group": "0d35f8ec-503d-483e-bcd5-6f1acf2c5d1a",
+    "created_by": "98c24c25-5d8c-4338-9977-8e56fd89342c"
+  }
+},
+{
+  "model": "directories.directory",
+  "pk": "a555dbf4-d459-43fd-88e7-35dfa0b4bee2",
+  "fields": {
+    "created_at": "2025-12-03T15:22:07.699Z",
+    "updated_at": "2025-12-03T15:22:07.699Z",
+    "is_deleted": false,
+    "deleted_at": null,
+    "name": "Generate Subfolder",
+    "description": "Devolved modular adapter",
+    "parent": "eddd388f-73b0-4a04-a97c-85f963322de4",
+    "group": "23c4bb97-853d-43ca-baa0-85f87bd012d3",
+    "created_by": "17dd481e-96c3-43f1-b9b8-46a30021117d"
+  }
+},
+{
+  "model": "directories.directory",
+  "pk": "afde9a33-7864-49ba-8083-949f53156543",
+  "fields": {
+    "created_at": "2025-12-03T15:22:07.599Z",
+    "updated_at": "2025-12-03T15:22:07.599Z",
+    "is_deleted": false,
+    "deleted_at": null,
+    "name": "Redefine Subfolder",
+    "description": "Fundamental secondary concept",
+    "parent": "dde5927a-68bc-480b-86d5-02442db80d31",
+    "group": "59175099-ae4b-4bbf-bec1-0c23a0c8f272",
+    "created_by": "7b1a8a60-2f9f-4af8-89f5-5e3db1007596"
+  }
+},
+{
+  "model": "directories.directory",
+  "pk": "b296f642-37bb-44e8-966f-3740d22ffb7d",
+  "fields": {
+    "created_at": "2025-12-03T15:22:07.609Z",
+    "updated_at": "2025-12-03T15:22:07.609Z",
+    "is_deleted": false,
+    "deleted_at": null,
+    "name": "Implement Folder",
+    "description": "Centralized client-server Graphical User Interface",
+    "parent": null,
+    "group": "1f4d57f3-2980-4b38-8ba9-438e3b5ad849",
+    "created_by": "9711f46b-8065-496a-b901-d4fc14d2161e"
+  }
+},
+{
+  "model": "directories.directory",
+  "pk": "bd4f20d4-73ff-4466-a466-5d0969d8c97f",
+  "fields": {
+    "created_at": "2025-12-03T15:22:07.672Z",
+    "updated_at": "2025-12-03T15:22:07.672Z",
+    "is_deleted": false,
+    "deleted_at": null,
+    "name": "Mesh Subfolder",
+    "description": "Monitored 6thgeneration system engine",
+    "parent": "3c19a8fb-82fe-4d3b-abf1-54e20edb7997",
+    "group": "0d35f8ec-503d-483e-bcd5-6f1acf2c5d1a",
+    "created_by": "98c24c25-5d8c-4338-9977-8e56fd89342c"
+  }
+},
+{
+  "model": "directories.directory",
+  "pk": "be399fe6-658a-440c-ad7c-67a8ab8c131f",
+  "fields": {
+    "created_at": "2025-12-03T15:22:07.657Z",
+    "updated_at": "2025-12-03T15:22:07.657Z",
+    "is_deleted": false,
+    "deleted_at": null,
+    "name": "Incentivize Subfolder",
+    "description": "Front-line intermediate analyzer",
+    "parent": "d3e01d4c-4d9c-4a37-a041-1f4da2c921c7",
+    "group": "617ef5f5-6a0e-4e75-9af8-833611e7af95",
+    "created_by": "74f181b2-822a-4d6f-8a95-4e93279e99fa"
+  }
+},
+{
+  "model": "directories.directory",
+  "pk": "c746524a-3417-4112-bda8-4cd221e6f36c",
+  "fields": {
+    "created_at": "2025-12-03T15:22:07.718Z",
+    "updated_at": "2025-12-03T15:22:07.718Z",
+    "is_deleted": false,
+    "deleted_at": null,
+    "name": "Disintermediate Subfolder",
+    "description": "Multi-channeled intermediate intranet",
+    "parent": "29887968-a66c-4861-a750-3968c3b24b4c",
+    "group": "746ec4fb-a136-46c4-a4ca-6e7ffb3a2540",
+    "created_by": "65a42ce2-d883-4caa-bf05-fc63ea17ac7e"
+  }
+},
+{
+  "model": "directories.directory",
+  "pk": "d3e01d4c-4d9c-4a37-a041-1f4da2c921c7",
+  "fields": {
+    "created_at": "2025-12-03T15:22:07.649Z",
+    "updated_at": "2025-12-03T15:22:07.649Z",
+    "is_deleted": false,
+    "deleted_at": null,
+    "name": "Synergize Folder",
+    "description": "Robust multi-tasking open system",
+    "parent": null,
+    "group": "617ef5f5-6a0e-4e75-9af8-833611e7af95",
+    "created_by": "74f181b2-822a-4d6f-8a95-4e93279e99fa"
+  }
+},
+{
+  "model": "directories.directory",
+  "pk": "d705fbf8-e88c-44e5-899a-4e028f66fcd4",
+  "fields": {
+    "created_at": "2025-12-03T15:22:07.704Z",
+    "updated_at": "2025-12-03T15:22:07.704Z",
+    "is_deleted": false,
+    "deleted_at": null,
+    "name": "Embrace Subfolder",
+    "description": "User-centric regional alliance",
+    "parent": "81c471ed-dd66-468f-9a7c-f5ab495b66d4",
+    "group": "a6add9c4-f183-4f3b-9ffc-d5663e5290fa",
+    "created_by": "17dd481e-96c3-43f1-b9b8-46a30021117d"
+  }
+},
+{
+  "model": "directories.directory",
+  "pk": "db0af8d6-9afe-4681-bbf7-4cd850e720c6",
+  "fields": {
+    "created_at": "2025-12-03T15:22:07.613Z",
+    "updated_at": "2025-12-03T15:22:07.613Z",
+    "is_deleted": false,
+    "deleted_at": null,
+    "name": "Matrix Subfolder",
+    "description": "Face-to-face analyzing framework",
+    "parent": "b296f642-37bb-44e8-966f-3740d22ffb7d",
+    "group": "1f4d57f3-2980-4b38-8ba9-438e3b5ad849",
+    "created_by": "9711f46b-8065-496a-b901-d4fc14d2161e"
+  }
+},
+{
+  "model": "directories.directory",
+  "pk": "dde5927a-68bc-480b-86d5-02442db80d31",
+  "fields": {
+    "created_at": "2025-12-03T15:22:07.592Z",
+    "updated_at": "2025-12-03T15:22:07.592Z",
+    "is_deleted": false,
+    "deleted_at": null,
+    "name": "Transform Folder",
+    "description": "Re-contextualized coherent array",
+    "parent": null,
+    "group": "59175099-ae4b-4bbf-bec1-0c23a0c8f272",
+    "created_by": "7b1a8a60-2f9f-4af8-89f5-5e3db1007596"
+  }
+},
+{
+  "model": "directories.directory",
+  "pk": "e3e678cb-e553-4101-821c-2bf1e8e0747b",
+  "fields": {
+    "created_at": "2025-12-03T15:22:07.640Z",
+    "updated_at": "2025-12-03T15:22:07.640Z",
+    "is_deleted": false,
+    "deleted_at": null,
+    "name": "Revolutionize Folder",
+    "description": "Monitored 24hour paradigm",
+    "parent": null,
+    "group": "1f4d57f3-2980-4b38-8ba9-438e3b5ad849",
+    "created_by": "9711f46b-8065-496a-b901-d4fc14d2161e"
+  }
+},
+{
+  "model": "directories.directory",
+  "pk": "e7a0fde1-67df-4262-872d-5235243c85b9",
+  "fields": {
+    "created_at": "2025-12-03T15:22:07.725Z",
+    "updated_at": "2025-12-03T15:22:07.725Z",
+    "is_deleted": false,
+    "deleted_at": null,
+    "name": "Productize Subfolder",
+    "description": "Advanced user-facing customer loyalty",
+    "parent": "f4c3fbab-11b3-4f70-b56e-cf6f8200e086",
+    "group": "746ec4fb-a136-46c4-a4ca-6e7ffb3a2540",
+    "created_by": "65a42ce2-d883-4caa-bf05-fc63ea17ac7e"
+  }
+},
+{
+  "model": "directories.directory",
+  "pk": "eddd388f-73b0-4a04-a97c-85f963322de4",
+  "fields": {
+    "created_at": "2025-12-03T15:22:07.695Z",
+    "updated_at": "2025-12-03T15:22:07.695Z",
+    "is_deleted": false,
+    "deleted_at": null,
+    "name": "Visualize Folder",
+    "description": "Persistent explicit intranet",
+    "parent": null,
+    "group": "23c4bb97-853d-43ca-baa0-85f87bd012d3",
+    "created_by": "17dd481e-96c3-43f1-b9b8-46a30021117d"
+  }
+},
+{
+  "model": "directories.directory",
+  "pk": "f3410222-a95b-406c-a734-4c3bd70758b7",
+  "fields": {
+    "created_at": "2025-12-03T15:22:07.606Z",
+    "updated_at": "2025-12-03T15:22:07.606Z",
+    "is_deleted": false,
+    "deleted_at": null,
+    "name": "Incentivize Subfolder",
+    "description": "Synergized exuding budgetary management",
+    "parent": "25a99d28-a765-4cc1-9cae-5d1dd0b13fc1",
+    "group": "85b06970-a022-46c0-8c62-58c1ce3eaf5b",
+    "created_by": "54d73d0e-3094-4f89-bd06-d729fc2be9fa"
+  }
+},
+{
+  "model": "directories.directory",
+  "pk": "f4c3fbab-11b3-4f70-b56e-cf6f8200e086",
+  "fields": {
+    "created_at": "2025-12-03T15:22:07.721Z",
+    "updated_at": "2025-12-03T15:22:07.721Z",
+    "is_deleted": false,
+    "deleted_at": null,
+    "name": "Revolutionize Folder",
+    "description": "Profound 24hour protocol",
+    "parent": null,
+    "group": "746ec4fb-a136-46c4-a4ca-6e7ffb3a2540",
+    "created_by": "65a42ce2-d883-4caa-bf05-fc63ea17ac7e"
+  }
+},
+{
+  "model": "directories.directory",
+  "pk": "f9573125-989f-49a9-822e-fdfd0805e248",
+  "fields": {
+    "created_at": "2025-12-03T15:22:07.664Z",
+    "updated_at": "2025-12-03T15:22:07.664Z",
+    "is_deleted": false,
+    "deleted_at": null,
+    "name": "Engage Folder",
+    "description": "Pre-emptive optimal approach",
+    "parent": null,
+    "group": "74d3192a-2d96-4159-8dc0-f0e316d029e0",
+    "created_by": "54d73d0e-3094-4f89-bd06-d729fc2be9fa"
+  }
+}
+]

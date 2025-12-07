@@ -276,3 +276,8 @@ LOGGING = {
 
 # Create logs directory if it doesn't exist
 (BASE_DIR / 'logs').mkdir(exist_ok=True)
+
+# Authentication Settings
+LOGIN_URL = 'users:login'
+LOGIN_REDIRECT_URL = 'core:dashboard'
+LOGOUT_REDIRECT_URL = 'core:landing'
