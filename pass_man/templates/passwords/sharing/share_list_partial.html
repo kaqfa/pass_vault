@@ -1,0 +1,39 @@
+<div id="share-list" class="space-y-4">
+    <div class="flex items-center justify-between">
+         <h3 class="font-semibold leading-none tracking-tight">Shared With</h3>
+    </div>
+
+    {% if shares %}
+        <div class="rounded-md border">
+            <div class="relative w-full overflow-auto">
+                <table class="w-full caption-bottom text-sm">
+                    <tbody class="[&_tr:last-child]:border-0">
+                        {% for share in shares %}
+                            <tr class="border-b transition-colors hover:bg-muted/50 data-[state=selected]:bg-muted">
+                                <td class="p-4 align-middle [&:has([role=checkbox])]:pr-0">
+                                    <div class="flex flex-col">
+                                        <span class="font-medium">{{ share.shared_with.email }}</span>
+                                        <span class="text-xs text-muted-foreground">{{ share.permission|title }}</span>
+                                    </div>
+                                </td>
+                                <td class="p-4 align-middle [&:has([role=checkbox])]:pr-0 text-right">
+                                    <button class="inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 hover:bg-destructive/10 hover:text-destructive h-8 w-8 text-muted-foreground"
+                                            hx-post="{% url 'passwords:share_revoke' password.id share.id %}"
+                                            hx-target="#share-list"
+                                            hx-swap="outerHTML"
+                                            hx-confirm="Are you sure you want to revoke access?">
+                                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="h-4 w-4"><path d="M18 6 6 18"/><path d="m6 6 18 12"/></svg>
+                                    </button>
+                                </td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    {% else %}
+        <div class="text-sm text-muted-foreground">
+            Not shared with anyone yet.
+        </div>
+    {% endif %}
+</div>

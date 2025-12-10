@@ -16,7 +16,7 @@ from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib import messages
-from django.views.generic import TemplateView, View
+from django.views.generic import TemplateView, View, ListView
 from django.urls import reverse_lazy, reverse
 from django.http import JsonResponse, HttpResponse
 from django.utils.decorators import method_decorator
@@ -32,7 +32,7 @@ from rest_framework.response import Response
 from apps.core.views import BaseView
 from apps.core.exceptions import ServiceError, ValidationError as CustomValidationError
 from apps.passwords.services import PasswordService, PasswordGeneratorService
-from apps.passwords.models import Password, PasswordHistory
+from apps.passwords.models import Password, PasswordHistory, PasswordShare
 from apps.groups.models import Group
 
 logger = logging.getLogger(__name__)
@@ -675,9 +675,103 @@ def api_password_delete(request, password_id):
             'success': True,
             'message': 'Password deleted successfully'
         })
-        
     except ServiceError as e:
         return Response({
             'success': False,
             'message': str(e)
         }, status=status.HTTP_400_BAD_REQUEST)
+
+
+class PasswordShareCreateView(LoginRequiredMixin, View):
+    """View to handle sharing a password with another user."""
+    
+    def post(self, request, password_id):
+        password = get_object_or_404(Password, id=password_id)
+        
+        # Check permission (Owner or Owner of Group or Admin of Group)
+        if password.created_by != request.user and password.group.owner != request.user:
+            # Also check if user is admin in the group
+            membership = password.group.members.filter(user=request.user).first()
+            if not membership or membership.role != 'admin':
+                return JsonResponse({'error': 'Permission denied'}, status=403)
+        
+        email = request.POST.get('email')
+        permission = request.POST.get('permission', PasswordShare.Permission.VIEW)
+        
+        if not email:
+            return JsonResponse({'error': 'Email is required'}, status=400)
+            
+        try:
+            shared_with = User.objects.get(email=request.POST.get('email'))
+        except User.DoesNotExist:
+            return JsonResponse({'error': 'User not found'}, status=404)
+            
+        if shared_with == request.user:
+            return JsonResponse({'error': 'Cannot share with yourself'}, status=400)
+            
+        # Check if already shared
+        if PasswordShare.objects.filter(password=password, shared_with=shared_with).exists():
+             return JsonResponse({'error': 'Already shared with this user'}, status=400)
+
+        share = PasswordShare.objects.create(
+            password=password,
+            shared_by=request.user,
+            shared_with=shared_with,
+            permission=permission
+        )
+        
+        # If HTMX request, render the updated list
+        if request.headers.get('HX-Request'):
+             shares = password.shares.all().select_related('shared_with')
+             return render(request, 'passwords/sharing/share_list_partial.html', {
+                 'password': password,
+                 'shares': shares
+             })
+             
+        return JsonResponse({'message': 'Shared successfully', 'share_id': share.id})
+
+
+class PasswordShareRevokeView(LoginRequiredMixin, View):
+    """View to revoke a password share."""
+    
+    def post(self, request, password_id, share_id):
+        share = get_object_or_404(PasswordShare, id=share_id, password_id=password_id)
+        password = share.password
+        
+        # Verify permission
+        if password.created_by != request.user and password.group.owner != request.user:
+             # Check group admin
+            membership = password.group.members.filter(user=request.user).first()
+            if not membership or membership.role != 'admin':
+                 # Also allow the person who SHARED it to revoke it
+                if share.shared_by != request.user:
+                    return JsonResponse({'error': 'Permission denied'}, status=403)
+
+        share.delete()
+        
+        if request.headers.get('HX-Request'):
+             shares = password.shares.all().select_related('shared_with')
+             return render(request, 'passwords/sharing/share_list_partial.html', {
+                 'password': password,
+                 'shares': shares
+             })
+
+        return JsonResponse({'message': 'Share revoked'})
+
+
+class SharedPasswordListView(LoginRequiredMixin, ListView):
+    """List of passwords shared WITH the current user."""
+    model = PasswordShare
+    template_name = 'passwords/shared_with_me.html'
+    context_object_name = 'shares'
+    
+    def get_queryset(self):
+        return PasswordShare.objects.filter(
+            shared_with=self.request.user
+        ).select_related('password', 'password__group', 'shared_by').order_by('-created_at')
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        # Filter out expired
+        context['shares'] = [s for s in context['shares'] if not s.is_expired()]
+        return context

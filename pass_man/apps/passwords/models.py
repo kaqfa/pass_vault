@@ -467,3 +467,70 @@ class PasswordAccessLog(BaseModel):
     
     def __str__(self):
         return f"{self.password.title} accessed by {self.user.email} at {self.accessed_at}"
+
+
+class PasswordShare(BaseModel):
+    """
+    Password sharing model.
+    
+    Tracks passwords shared between users with specific permissions.
+    """
+    
+    class Permission(models.TextChoices):
+        VIEW = 'view', 'View'
+        EDIT = 'edit', 'Edit'
+    
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    password = models.ForeignKey(
+        Password,
+        on_delete=models.CASCADE,
+        related_name='shares',
+        help_text="Password being shared"
+    )
+    
+    shared_by = models.ForeignKey(
+        User,
+        on_delete=models.CASCADE,
+        related_name='shared_passwords_given',
+        help_text="User who shared the password"
+    )
+    
+    shared_with = models.ForeignKey(
+        User,
+        on_delete=models.CASCADE,
+        related_name='shared_passwords_received',
+        help_text="User who received the password"
+    )
+    
+    permission = models.CharField(
+        max_length=20,
+        choices=Permission.choices,
+        default=Permission.VIEW,
+        help_text="Access permission level"
+    )
+    
+    expires_at = models.DateTimeField(
+        null=True,
+        blank=True,
+        help_text="When share access expires"
+    )
+    
+    class Meta:
+        ordering = ['-created_at']
+        unique_together = ['password', 'shared_with']
+        indexes = [
+            models.Index(fields=['password', 'shared_with']),
+            models.Index(fields=['shared_with', 'permission']),
+            models.Index(fields=['expires_at']),
+        ]
+        verbose_name = "Password Share"
+        verbose_name_plural = "Password Shares"
+    
+    def __str__(self):
+        return f"{self.password.title} shared with {self.shared_with.email} ({self.permission})"
+    
+    def is_expired(self) -> bool:
+        """Check if share is expired."""
+        if not self.expires_at:
+            return False
+        return timezone.now() > self.expires_at

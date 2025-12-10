@@ -1,0 +1,68 @@
+{% extends "layouts/authenticated_content.html" %}
+{% load static %}
+
+{% block page_title %}Shared with Me{% endblock %}
+
+{% block authenticated_content %}
+<div class="flex flex-col gap-4">
+    <!-- Header -->
+    <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+        <h2 class="text-2xl font-bold tracking-tight">Shared Passwords</h2>
+    </div>
+
+    <!-- List -->
+    <div class="rounded-md border bg-card text-card-foreground shadow-sm">
+        <div class="relative w-full overflow-auto">
+            <table class="w-full caption-bottom text-sm">
+                <thead class="[&_tr]:border-b">
+                    <tr class="border-b transition-colors hover:bg-muted/50 data-[state=selected]:bg-muted">
+                        <th class="h-12 px-4 text-left align-middle font-medium text-muted-foreground [&:has([role=checkbox])]:pr-0">Name</th>
+                        <th class="h-12 px-4 text-left align-middle font-medium text-muted-foreground [&:has([role=checkbox])]:pr-0">Shared By</th>
+                        <th class="h-12 px-4 text-left align-middle font-medium text-muted-foreground [&:has([role=checkbox])]:pr-0">Username</th>
+                        <th class="h-12 px-4 text-left align-middle font-medium text-muted-foreground [&:has([role=checkbox])]:pr-0">Permission</th>
+                        <th class="h-12 px-4 text-left align-middle font-medium text-muted-foreground [&:has([role=checkbox])]:pr-0">Received</th>
+                    </tr>
+                </thead>
+                <tbody class="[&_tr:last-child]:border-0">
+                    {% for share in shares %}
+                    <tr class="border-b transition-colors hover:bg-muted/50 data-[state=selected]:bg-muted cursor-pointer" onclick="window.location='{% url 'passwords:detail' share.password.pk %}'">
+                        <td class="p-4 align-middle [&:has([role=checkbox])]:pr-0 font-medium">
+                            <div class="flex items-center gap-3">
+                                <div class="flex items-center justify-center w-8 h-8 rounded-full bg-primary/10 text-primary">
+                                    {% if share.password.icon %}
+                                        <img src="{{ share.password.icon.url }}" alt="" class="w-5 h-5">
+                                    {% else %}
+                                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="h-4 w-4"><rect width="18" height="11" x="3" y="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+                                    {% endif %}
+                                </div>
+                                <span>{{ share.password.title }}</span>
+                            </div>
+                        </td>
+                        <td class="p-4 align-middle [&:has([role=checkbox])]:pr-0 text-muted-foreground">
+                            {{ share.shared_by.email }}
+                        </td>
+                        <td class="p-4 align-middle [&:has([role=checkbox])]:pr-0 text-muted-foreground">
+                            {{ share.password.username|default:"-" }}
+                        </td>
+                        <td class="p-4 align-middle [&:has([role=checkbox])]:pr-0">
+                            <span class="inline-flex items-center rounded-full border px-2.5 py-0.5 text-xs font-semibold transition-colors focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 border-transparent bg-secondary text-secondary-foreground hover:bg-secondary/80">
+                                {{ share.permission|title }}
+                            </span>
+                        </td>
+                        <td class="p-4 align-middle [&:has([role=checkbox])]:pr-0 text-muted-foreground text-xs">
+                            {{ share.created_at|date:"M d, Y" }}
+                        </td>
+                    </tr>
+                    {% empty %}
+                     <tr>
+                        <td colspan="5" class="p-8 text-center text-muted-foreground">
+                            No shared passwords found.
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}

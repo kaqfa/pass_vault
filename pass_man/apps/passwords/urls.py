@@ -26,4 +26,9 @@ urlpatterns = [
     path('ajax/<uuid:password_id>/reveal/', views.ajax_reveal_password, name='ajax_reveal'),
     path('ajax/<uuid:password_id>/favorite/', views.ajax_toggle_favorite, name='ajax_favorite'),
     path('ajax/generate/', views.ajax_generate_password, name='ajax_generate'),
+    
+    # Sharing Views
+    path('shared-with-me/', views.SharedPasswordListView.as_view(), name='shared_list'),
+    path('<uuid:password_id>/share/', views.PasswordShareCreateView.as_view(), name='share_create'),
+    path('<uuid:password_id>/share/<uuid:share_id>/revoke/', views.PasswordShareRevokeView.as_view(), name='share_revoke'),
 ]

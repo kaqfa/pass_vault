@@ -1,0 +1,26 @@
+<dialog id="share-dialog" class="backdrop:bg-black/50 p-0 rounded-lg shadow-lg open:animate-in open:fade-in-0 open:zoom-in-95 backdrop:animate-in backdrop:fade-in-0">
+    <div class="w-[400px] bg-card text-card-foreground p-0">
+        <div class="flex flex-col space-y-1.5 p-6 pb-4 border-b">
+            <h3 class="font-semibold leading-none tracking-tight">Share Password</h3>
+            <p class="text-sm text-muted-foreground">Share this password with another user.</p>
+        </div>
+        <form hx-post="{% url 'passwords:share_create' password.id %}" hx-target="#share-list" hx-swap="outerHTML" hx-on::after-request="if(event.detail.successful) document.getElementById('share-dialog').close()" class="p-6 space-y-4">
+            {% csrf_token %}
+            <div class="space-y-2">
+                <label for="shareEmail" class="text-sm font-medium leading-none">Email Address</label>
+                <input type="email" id="shareEmail" name="email" required placeholder="user@example.com" class="flex h-9 w-full rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-sm transition-colors file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-50">
+            </div>
+            <div class="space-y-2">
+                <label for="sharePermission" class="text-sm font-medium leading-none">Permission</label>
+                <select id="sharePermission" name="permission" class="flex h-9 w-full rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-sm transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-50">
+                    <option value="view">View Only</option>
+                    <option value="edit">Can Edit</option>
+                </select>
+            </div>
+            <div class="flex justify-end gap-2 pt-2">
+                <button type="button" onclick="document.getElementById('share-dialog').close()" class="inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 border border-input bg-background hover:bg-accent hover:text-accent-foreground h-9 px-4 py-2">Cancel</button>
+                <button type="submit" class="inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 bg-primary text-primary-foreground hover:bg-primary/90 h-9 px-4 py-2">Share</button>
+            </div>
+        </form>
+    </div>
+</dialog>
