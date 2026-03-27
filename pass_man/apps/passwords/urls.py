@@ -18,6 +18,7 @@ urlpatterns = [
     # Web Views
     path('', views.PasswordListView.as_view(), name='list'),
     path('create/', views.PasswordCreateView.as_view(), name='create'),
+    path('generator/', views.PasswordGeneratorView.as_view(), name='generator'),
     path('<uuid:password_id>/', views.PasswordDetailView.as_view(), name='detail'),
     path('<uuid:password_id>/edit/', views.PasswordEditView.as_view(), name='edit'),
     path('<uuid:password_id>/delete/', views.PasswordDeleteView.as_view(), name='delete'),
@@ -25,6 +26,7 @@ urlpatterns = [
     # AJAX Views
     path('ajax/<uuid:password_id>/reveal/', views.ajax_reveal_password, name='ajax_reveal'),
     path('ajax/<uuid:password_id>/favorite/', views.ajax_toggle_favorite, name='ajax_favorite'),
+    path('ajax/<uuid:password_id>/move/', views.ajax_move_password, name='ajax_move'),
     path('ajax/generate/', views.ajax_generate_password, name='ajax_generate'),
     
     # Sharing Views

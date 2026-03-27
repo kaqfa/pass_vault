@@ -1,0 +1,253 @@
+{% extends "layouts/authenticated_content.html" %}
+{% load static %}
+
+{% block page_title %}Directories{% endblock %}
+
+{% block authenticated_content %}
+<div class="flex flex-col gap-6" x-data="directoryManager()">
+    <!-- Header -->
+    <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+        <div>
+            <h2 class="text-2xl font-bold tracking-tight">Directories</h2>
+            <p class="text-muted-foreground">Organize your passwords with hierarchical directories.</p>
+        </div>
+        <button
+            @click="showCreateModal = true"
+            class="inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 bg-primary text-primary-foreground hover:bg-primary/90 h-10 px-4 py-2"
+        >
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="mr-2 h-4 w-4"><path d="M5 12h14"/><path d="M12 5v14"/></svg>
+            New Directory
+        </button>
+    </div>
+
+    <!-- Directories by Group -->
+    {% if group_directories %}
+        {% for group_data in group_directories %}
+        <div class="rounded-lg border bg-card text-card-foreground shadow-sm">
+            <div class="flex items-center p-4 border-b bg-muted/50">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="h-5 w-5 mr-2 text-muted-foreground"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+                <h3 class="font-semibold">{{ group_data.group.name }}</h3>
+                <span class="ml-2 text-sm text-muted-foreground">({{ group_data.directories|length }} directories)</span>
+            </div>
+
+            {% if group_data.directories %}
+            <div class="divide-y">
+                {% for dir in group_data.directories %}
+                    <div class="directory-item p-4 hover:bg-muted/50 transition-colors">
+                        <!-- Root Directory -->
+                        <div class="flex items-center justify-between">
+                            <div class="flex items-center gap-3">
+                                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="h-5 w-5 text-amber-500"><path d="M2.25 12.75V12a2.25 2.25 0 0 1 2.25-2.25h15A2.25 2.25 0 0 1 21.75 12v.75m-8.69-6.44-2.12-2.12a1.5 1.5 0 0 0-1.061-.44H4.5A2.25 2.25 0 0 0 2.25 6v12a2.25 2.25 0 0 0 2.25 2.25h15A2.25 2.25 0 0 0 21.75 18V9a2.25 2.25 0 0 0-2.25-2.25h-5.379a1.5 1.5 0 0 1-1.06-.44z"/></svg>
+                                <div>
+                                    <p class="font-medium">{{ dir.name }}</p>
+                                    {% if dir.description %}
+                                    <p class="text-sm text-muted-foreground">{{ dir.description }}</p>
+                                    {% endif %}
+                                </div>
+                            </div>
+                            <div class="flex items-center gap-4">
+                                <span class="text-sm text-muted-foreground">{{ dir.password_count }} passwords</span>
+                                <div class="flex items-center gap-2">
+                                    <button
+                                        onclick="openEditModal('{{ dir.id }}', '{{ dir.name }}', '{{ dir.description|default:'' }}')"
+                                        class="inline-flex items-center justify-center rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 hover:bg-accent hover:text-accent-foreground h-8 w-8"
+                                        title="Edit"
+                                    >
+                                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="h-4 w-4"><path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"/><path d="m15 5 4 4"/></svg>
+                                    </button>
+                                    <button
+                                        onclick="openDeleteModal('{{ dir.id }}', '{{ dir.name }}')"
+                                        class="inline-flex items-center justify-center rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 hover:bg-destructive hover:text-destructive-foreground h-8 w-8"
+                                        title="Delete"
+                                    >
+                                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="h-4 w-4"><path d="M3 6h18"/><path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"/><path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"/></svg>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Subdirectories -->
+                        {% if dir.children %}
+                        <div class="ml-8 mt-2 space-y-2">
+                            {% for subdir in dir.children %}
+                            <div class="flex items-center justify-between p-2 rounded border bg-background">
+                                <div class="flex items-center gap-3">
+                                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="h-4 w-4 text-amber-500"><path d="m9 5 7 7-7 7"/></svg>
+                                    <div>
+                                        <p class="text-sm font-medium">{{ subdir.name }}</p>
+                                        {% if subdir.description %}
+                                        <p class="text-xs text-muted-foreground">{{ subdir.description }}</p>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                                <div class="flex items-center gap-4">
+                                    <span class="text-xs text-muted-foreground">{{ subdir.password_count }} passwords</span>
+                                    <div class="flex items-center gap-2">
+                                        <button
+                                            onclick="openEditModal('{{ subdir.id }}', '{{ subdir.name }}', '{{ subdir.description|default:'' }}')"
+                                            class="inline-flex items-center justify-center rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 hover:bg-accent hover:text-accent-foreground h-7 w-7"
+                                            title="Edit"
+                                        >
+                                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="h-3 w-3"><path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"/><path d="m15 5 4 4"/></svg>
+                                        </button>
+                                        <button
+                                            onclick="openDeleteModal('{{ subdir.id }}', '{{ subdir.name }}')"
+                                            class="inline-flex items-center justify-center rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 hover:bg-destructive hover:text-destructive-foreground h-7 w-7"
+                                            title="Delete"
+                                        >
+                                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="h-3 w-3"><path d="M3 6h18"/><path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"/><path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"/></svg>
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                            {% endfor %}
+                        </div>
+                        {% endif %}
+                    </div>
+                {% endfor %}
+            </div>
+            {% else %}
+            <div class="p-8 text-center text-muted-foreground">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="h-10 w-10 mx-auto mb-2 text-muted-foreground/50"><path d="M2.25 12.75V12a2.25 2.25 0 0 1 2.25-2.25h15A2.25 2.25 0 0 1 21.75 12v.75m-8.69-6.44-2.12-2.12a1.5 1.5 0 0 0-1.061-.44H4.5A2.25 2.25 0 0 0 2.25 6v12a2.25 2.25 0 0 0 2.25 2.25h15A2.25 2.25 0 0 0 21.75 18V9a2.25 2.25 0 0 0-2.25-2.25h-5.379a1.5 1.5 0 0 1-1.06-.44z"/></svg>
+                <p>No directories in this group.</p>
+            </div>
+            {% endif %}
+        </div>
+        {% endfor %}
+    {% else %}
+    <div class="rounded-lg border bg-card text-card-foreground shadow-sm p-12 text-center">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="h-16 w-16 mx-auto mb-4 text-muted-foreground/50"><path d="M2.25 12.75V12a2.25 2.25 0 0 1 2.25-2.25h15A2.25 2.25 0 0 1 21.75 12v.75m-8.69-6.44-2.12-2.12a1.5 1.5 0 0 0-1.061-.44H4.5A2.25 2.25 0 0 0 2.25 6v12a2.25 2.25 0 0 0 2.25 2.25h15A2.25 2.25 0 0 0 21.75 18V9a2.25 2.25 0 0 0-2.25-2.25h-5.379a1.5 1.5 0 0 1-1.06-.44z"/></svg>
+        <h3 class="text-lg font-semibold mb-2">No directories yet</h3>
+        <p class="text-muted-foreground mb-4">Create your first directory to organize your passwords.</p>
+        <button
+            @click="showCreateModal = true"
+            class="inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 bg-primary text-primary-foreground hover:bg-primary/90 h-10 px-4 py-2"
+        >
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="mr-2 h-4 w-4"><path d="M5 12h14"/><path d="M12 5v14"/></svg>
+            Create Directory
+        </button>
+    </div>
+    {% endif %}
+</div>
+
+<!-- Create/Edit Modal -->
+<div x-show="showCreateModal || showEditModal" x-transition.opacity class="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4" x-cloak>
+    <div class="bg-background rounded-lg shadow-lg w-full max-w-md" @click.outside="showCreateModal = false; showEditModal = false;">
+        <div class="p-6 border-b">
+            <h3 class="text-lg font-semibold" x-text="showEditModal ? 'Edit Directory' : 'Create Directory'">Create Directory</h3>
+        </div>
+        <form method="post" action="{% url 'directories:create' %}" class="p-6 space-y-4">
+            {% csrf_token %}
+            <input type="hidden" name="directory_id" x-model="editId">
+
+            <div>
+                <label class="block text-sm font-medium mb-1">Group</label>
+                <select name="group_id" required class="flex h-9 w-full rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-sm transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring">
+                    {% for group in user_groups %}
+                    <option value="{{ group.id }}">{{ group.name }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+
+            <div>
+                <label class="block text-sm font-medium mb-1">Directory Name</label>
+                <input
+                    type="text"
+                    name="name"
+                    x-model="editName"
+                    required
+                    class="flex h-9 w-full rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-sm transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
+                    placeholder="e.g., Work, Personal, Finance"
+                >
+            </div>
+
+            <div>
+                <label class="block text-sm font-medium mb-1">Description (Optional)</label>
+                <textarea
+                    name="description"
+                    x-model="editDescription"
+                    rows="2"
+                    class="flex w-full rounded-md border border-input bg-transparent px-3 py-2 text-sm shadow-sm transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
+                    placeholder="Brief description..."
+                ></textarea>
+            </div>
+
+            <div class="flex justify-end gap-2 pt-4">
+                <button
+                    type="button"
+                    @click="showCreateModal = false; showEditModal = false;"
+                    class="inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 border border-input bg-background hover:bg-accent hover:text-accent-foreground h-9 px-4 py-2"
+                >
+                    Cancel
+                </button>
+                <button
+                    type="submit"
+                    class="inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 bg-primary text-primary-foreground hover:bg-primary/90 h-9 px-4 py-2"
+                >
+                    <span x-text="showEditModal ? 'Update' : 'Create'">Create</span>
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- Delete Confirmation Modal -->
+<div x-show="showDeleteModal" x-transition.opacity class="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4" x-cloak>
+    <div class="bg-background rounded-lg shadow-lg w-full max-w-md" @click.outside="showDeleteModal = false;">
+        <div class="p-6 border-b">
+            <h3 class="text-lg font-semibold">Delete Directory</h3>
+        </div>
+        <div class="p-6">
+            <p class="text-muted-foreground mb-4">
+                Are you sure you want to delete "<span x-text="deleteName"></span>"? This action cannot be undone.
+            </p>
+            {% if delete_warning %}
+            <p class="text-sm text-amber-600 bg-amber-50 p-2 rounded mb-4">{{ delete_warning }}</p>
+            {% endif %}
+        </div>
+        <form method="post" action="" class="p-6 pt-0 flex justify-end gap-2">
+            {% csrf_token %}
+            <input type="hidden" name="directory_id" x-model="deleteId">
+            <button
+                type="button"
+                @click="showDeleteModal = false;"
+                class="inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 border border-input bg-background hover:bg-accent hover:text-accent-foreground h-9 px-4 py-2"
+            >
+                Cancel
+            </button>
+            <button
+                type="submit"
+                class="inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 bg-destructive text-destructive-foreground hover:bg-destructive/90 h-9 px-4 py-2"
+            >
+                Delete
+            </button>
+        </form>
+    </div>
+</div>
+
+<script>
+function directoryManager() {
+    return {
+        showCreateModal: false,
+        showEditModal: false,
+        showDeleteModal: false,
+        editId: '',
+        editName: '',
+        editDescription: '',
+
+        openEditModal(id, name, description) {
+            this.editId = id;
+            this.editName = name;
+            this.editDescription = description;
+            this.showEditModal = true;
+        },
+
+        openDeleteModal(id, name) {
+            this.deleteId = id;
+            this.deleteName = name;
+            this.showDeleteModal = true;
+        }
+    };
+}
+</script>
+{% endblock %}

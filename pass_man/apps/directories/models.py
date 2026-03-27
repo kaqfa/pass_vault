@@ -80,23 +80,43 @@ class Directory(BaseModel):
     
     def __str__(self):
         return f"{self.name} ({self.group.name})"
-    
+
+    def get_level(self):
+        """
+        Get the depth level of this directory in the hierarchy.
+
+        Returns:
+            int: Level (0 for root, 1 for first level, 2 for second level)
+        """
+        level = 0
+        current = self.parent
+        while current:
+            level += 1
+            current = current.parent
+        return level
+
     def clean(self):
         """Custom validation for Directory model."""
         super().clean()
-        
+
         if not self.name or not self.name.strip():
             raise ValidationError("Directory name cannot be empty")
-        
+
         if len(self.name.strip()) > 100:
             raise ValidationError("Directory name too long (max 100 characters)")
-            
+
         # Prevent circular references
         if self.parent and self.parent == self:
             raise ValidationError("Directory cannot be its own parent")
-            
+
         if self.parent and self.parent.group != self.group:
             raise ValidationError("Parent directory must belong to the same group")
+
+        # Enforce 2-level limit
+        if self.parent:
+            parent_level = self.parent.get_level()
+            if parent_level >= 1:
+                raise ValidationError("Directories can only be nested 2 levels deep")
             
     def save(self, *args, **kwargs):
         """Override save to perform validation."""

@@ -1,0 +1,11 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(dir:*)",
+      "Bash(del:*)",
+      "Bash(docker-compose:*)",
+      "Bash(python manage.py:*)",
+      "Bash(python:*)"
+    ]
+  }
+}

@@ -478,6 +478,7 @@ class PasswordShare(BaseModel):
     
     class Permission(models.TextChoices):
         VIEW = 'view', 'View'
+        COPY = 'copy', 'Copy'
         EDIT = 'edit', 'Edit'
     
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)

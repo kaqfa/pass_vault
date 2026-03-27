@@ -54,7 +54,9 @@ class PasswordListView(LoginRequiredMixin, BaseView):
             priority = request.GET.get('priority')
             is_favorite = request.GET.get('favorite')
             tag_filter = request.GET.get('tag')
-            
+            sort_by = request.GET.get('sort_by', 'updated_at')
+            sort_order = request.GET.get('sort_order', 'desc')
+
             # Build filters
             filters = {}
             if group_id:
@@ -65,12 +67,24 @@ class PasswordListView(LoginRequiredMixin, BaseView):
                 filters['is_favorite'] = is_favorite == 'true'
             if tag_filter:
                 filters['tags__contains'] = tag_filter
-            
+
             # Get passwords
             if query or filters:
                 passwords = PasswordService.search_passwords(request.user, query, filters)
             else:
                 passwords = PasswordService.get_user_passwords(request.user)
+
+            # Apply sorting
+            sort_field_mapping = {
+                'name': 'title',
+                'username': 'username',
+                'priority': 'priority',
+                'updated_at': 'updated_at',
+                'created_at': 'created_at',
+            }
+            sort_field = sort_field_mapping.get(sort_by, 'updated_at')
+            sort_prefix = '-' if sort_order == 'desc' else ''
+            passwords = passwords.order_by(f'{sort_prefix}{sort_field}')
             
             # Pagination
             paginator = Paginator(passwords, 20)
@@ -88,7 +102,13 @@ class PasswordListView(LoginRequiredMixin, BaseView):
             unique_tags = sorted(list(set(
                 tag for tags in all_tags_nested if tags for tag in tags
             )))
-            
+
+            # Get favorite count
+            favorite_count = Password.objects.filter(
+                created_by=request.user,
+                is_favorite=True
+            ).count()
+
             context = {
                 'page_title': 'My Passwords',
                 'passwords': page_obj,
@@ -102,9 +122,12 @@ class PasswordListView(LoginRequiredMixin, BaseView):
                     'tag': tag_filter
                 },
                 'priority_choices': Password.Priority.choices,
-                'total_count': len(passwords)
+                'total_count': len(passwords),
+                'favorite_count': favorite_count,
+                'sort_by': sort_by,
+                'sort_order': sort_order,
             }
-            
+
             return render(request, self.template_name, context)
             
         except ServiceError as e:
@@ -495,8 +518,36 @@ def ajax_generate_password(request):
             'password': generated_password,
             'strength': strength_analysis
         })
-        
+
     except Exception as e:
+        return JsonResponse({
+            'success': False,
+            'error': str(e)
+        }, status=400)
+
+
+@login_required
+def ajax_move_password(request, password_id):
+    """AJAX endpoint to move password to a different directory."""
+    if request.method != 'POST':
+        return JsonResponse({'error': 'Method not allowed'}, status=405)
+
+    try:
+        directory_id = request.POST.get('directory_id')
+
+        password = PasswordService.move_password(
+            user=request.user,
+            password_id=password_id,
+            directory_id=directory_id
+        )
+
+        return JsonResponse({
+            'success': True,
+            'directory_id': str(password.directory.id) if password.directory else None,
+            'directory_name': password.directory.name if password.directory else None
+        })
+
+    except (ServiceError, ValidationError) as e:
         return JsonResponse({
             'success': False,
             'error': str(e)
@@ -764,7 +815,7 @@ class SharedPasswordListView(LoginRequiredMixin, ListView):
     model = PasswordShare
     template_name = 'passwords/shared_with_me.html'
     context_object_name = 'shares'
-    
+
     def get_queryset(self):
         return PasswordShare.objects.filter(
             shared_with=self.request.user
@@ -775,3 +826,22 @@ class SharedPasswordListView(LoginRequiredMixin, ListView):
         # Filter out expired
         context['shares'] = [s for s in context['shares'] if not s.is_expired()]
         return context
+
+
+class PasswordGeneratorView(LoginRequiredMixin, BaseView):
+    """
+    Password generator view with strength indicator.
+
+    Provides a standalone password generator with customizable options.
+    """
+    template_name = 'passwords/generator.html'
+
+    def get(self, request):
+        """Display password generator page."""
+        context = {
+            'page_title': 'Password Generator',
+            'default_length': 16,
+            'min_length': 8,
+            'max_length': 64
+        }
+        return render(request, self.template_name, context)

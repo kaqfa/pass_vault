@@ -38,6 +38,9 @@ urlpatterns = [
     
     # Directories management
     path('directories/', include('apps.directories.urls')),
+
+    # Notifications
+    path('notifications/', include('apps.notifications.urls')),
 ]
 
 # Serve static and media files in development

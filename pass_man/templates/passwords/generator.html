@@ -1,0 +1,254 @@
+{% extends "layouts/authenticated_content.html" %}
+{% load static %}
+
+{% block page_title %}Password Generator{% endblock %}
+
+{% block authenticated_content %}
+<div class="max-w-2xl mx-auto" x-data="passwordGenerator()">
+    <!-- Header -->
+    <div class="mb-6">
+        <h1 class="text-3xl font-bold tracking-tight">Password Generator</h1>
+        <p class="text-muted-foreground mt-2">Generate strong, secure passwords with customizable options.</p>
+    </div>
+
+    <!-- Generated Password Display -->
+    <div class="rounded-lg border bg-card text-card-foreground shadow-sm mb-6">
+        <div class="p-6">
+            <div class="flex items-center gap-4">
+                <div class="flex-1">
+                    <label class="text-sm font-medium text-muted-foreground">Generated Password</label>
+                    <div class="flex items-center gap-2 mt-2">
+                        <input
+                            type="text"
+                            x-model="generatedPassword"
+                            readonly
+                            class="flex h-12 w-full rounded-md border border-input bg-transparent px-4 py-2 text-lg font-mono tracking-wider"
+                            placeholder="Click Generate to create password"
+                        >
+                        <button
+                            @click="copyPassword()"
+                            :disabled="!generatedPassword"
+                            class="inline-flex items-center justify-center rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 border border-input bg-background hover:bg-accent hover:text-accent-foreground h-12 px-4"
+                            title="Copy to clipboard"
+                        >
+                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="h-5 w-5"><rect width="14" height="14" x="8" y="8" rx="2" ry="2"/><path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"/></svg>
+                        </button>
+                        <button
+                            @click="generatePassword()"
+                            class="inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 bg-primary text-primary-foreground hover:bg-primary/90 h-12 px-6"
+                        >
+                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="h-5 w-5"><path d="M21 12a9 9 0 0 0-9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/><path d="M3 12a9 9 0 0 0 9 9 9.75 9.75 0 0 0 6.74-2.74L21 16"/><path d="M16 21h5v-5"/></svg>
+                            Generate
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Strength Indicator -->
+            <div class="mt-4" x-show="generatedPassword">
+                <div class="flex items-center justify-between mb-2">
+                    <span class="text-sm font-medium">Strength</span>
+                    <span class="text-sm font-medium"
+                          :class="{
+                              'text-red-500': strength.score < 40,
+                              'text-yellow-500': strength.score >= 40 && strength.score < 70,
+                              'text-green-500': strength.score >= 70
+                          }"
+                          x-text="strength.strength"></span>
+                </div>
+                <div class="h-2 w-full bg-secondary rounded-full overflow-hidden">
+                    <div class="h-full transition-all duration-300"
+                         :class="{
+                             'bg-red-500': strength.score < 40,
+                             'bg-yellow-500': strength.score >= 40 && strength.score < 70,
+                             'bg-green-500': strength.score >= 70
+                         }"
+                         :style="`width: ${strength.score}%`">
+                    </div>
+                </div>
+                <ul class="mt-2 space-y-1">
+                    <template x-for="feedback in strength.feedback" :key="feedback">
+                        <li class="text-xs text-muted-foreground" x-text="feedback"></li>
+                    </template>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <!-- Generator Options -->
+    <div class="rounded-lg border bg-card text-card-foreground shadow-sm">
+        <div class="p-6">
+            <h2 class="text-lg font-semibold mb-4">Options</h2>
+
+            <!-- Length Slider -->
+            <div class="mb-6">
+                <div class="flex items-center justify-between mb-2">
+                    <label class="text-sm font-medium">Password Length</label>
+                    <span class="text-sm font-mono bg-muted px-2 py-1 rounded" x-text="options.length"></span>
+                </div>
+                <input
+                    type="range"
+                    x-model="options.length"
+                    min="{{ min_length }}"
+                    max="{{ max_length }}"
+                    class="w-full h-2 bg-secondary rounded-lg appearance-none cursor-pointer accent-primary"
+                    @change="generatePassword()"
+                >
+                <div class="flex justify-between text-xs text-muted-foreground mt-1">
+                    <span>{{ min_length }}</span>
+                    <span>{{ max_length }}</span>
+                </div>
+            </div>
+
+            <!-- Character Types -->
+            <div class="space-y-3">
+                <label class="flex items-center gap-3 p-3 rounded-lg border hover:bg-accent cursor-pointer">
+                    <input type="checkbox" x-model="options.include_uppercase" @change="generatePassword()" class="h-4 w-4 rounded border-input">
+                    <span class="flex-1 font-medium">Uppercase Letters</span>
+                    <span class="text-sm text-muted-foreground font-mono">A-Z</span>
+                </label>
+
+                <label class="flex items-center gap-3 p-3 rounded-lg border hover:bg-accent cursor-pointer">
+                    <input type="checkbox" x-model="options.include_lowercase" @change="generatePassword()" class="h-4 w-4 rounded border-input">
+                    <span class="flex-1 font-medium">Lowercase Letters</span>
+                    <span class="text-sm text-muted-foreground font-mono">a-z</span>
+                </label>
+
+                <label class="flex items-center gap-3 p-3 rounded-lg border hover:bg-accent cursor-pointer">
+                    <input type="checkbox" x-model="options.include_numbers" @change="generatePassword()" class="h-4 w-4 rounded border-input">
+                    <span class="flex-1 font-medium">Numbers</span>
+                    <span class="text-sm text-muted-foreground font-mono">0-9</span>
+                </label>
+
+                <label class="flex items-center gap-3 p-3 rounded-lg border hover:bg-accent cursor-pointer">
+                    <input type="checkbox" x-model="options.include_symbols" @change="generatePassword()" class="h-4 w-4 rounded border-input">
+                    <span class="flex-1 font-medium">Symbols</span>
+                    <span class="text-sm text-muted-foreground font-mono">!@#$%^&*</span>
+                </label>
+
+                <label class="flex items-center gap-3 p-3 rounded-lg border hover:bg-accent cursor-pointer">
+                    <input type="checkbox" x-model="options.exclude_ambiguous" @change="generatePassword()" class="h-4 w-4 rounded border-input">
+                    <span class="flex-1 font-medium">Exclude Ambiguous Characters</span>
+                    <span class="text-sm text-muted-foreground font-mono">0, O, 1, l, I</span>
+                </label>
+            </div>
+        </div>
+    </div>
+
+    <!-- History -->
+    <div class="rounded-lg border bg-card text-card-foreground shadow-sm mt-6" x-show="history.length > 0">
+        <div class="p-6">
+            <div class="flex items-center justify-between mb-4">
+                <h2 class="text-lg font-semibold">Recent Generated</h2>
+                <button @click="clearHistory()" class="text-sm text-muted-foreground hover:text-foreground">Clear</button>
+            </div>
+            <div class="space-y-2">
+                <template x-for="(item, index) in history" :key="index">
+                    <div class="flex items-center gap-2 p-2 rounded bg-muted/50">
+                        <span class="flex-1 font-mono text-sm truncate" x-text="item.password"></span>
+                        <button @click="copyToClipboard(item.password)" class="p-1 hover:bg-background rounded" title="Copy">
+                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="h-4 w-4"><rect width="14" height="14" x="8" y="8" rx="2" ry="2"/><path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"/></svg>
+                        </button>
+                        <span class="text-xs text-muted-foreground" x-text="item.strength"></span>
+                    </div>
+                </template>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+function passwordGenerator() {
+    return {
+        generatedPassword: '',
+        options: {
+            length: {{ default_length }},
+            include_uppercase: true,
+            include_lowercase: true,
+            include_numbers: true,
+            include_symbols: true,
+            exclude_ambiguous: true
+        },
+        strength: {
+            score: 0,
+            strength: '',
+            feedback: []
+        },
+        history: [],
+
+        init() {
+            // Generate initial password on load
+            this.generatePassword();
+        },
+
+        async generatePassword() {
+            // Validate at least one character type is selected
+            if (!this.options.include_uppercase && !this.options.include_lowercase &&
+                !this.options.include_numbers && !this.options.include_symbols) {
+                showToast('Please select at least one character type', 'error');
+                return;
+            }
+
+            const csrfToken = document.querySelector('[name=csrfmiddlewaretoken]').value;
+
+            try {
+                const response = await fetch('{% url "passwords:ajax_generate" %}', {
+                    method: 'POST',
+                    headers: {
+                        'X-CSRFToken': csrfToken,
+                        'Content-Type': 'application/x-www-form-urlencoded'
+                    },
+                    body: new URLSearchParams({
+                        length: this.options.length,
+                        include_uppercase: this.options.include_uppercase,
+                        include_lowercase: this.options.include_lowercase,
+                        include_numbers: this.options.include_numbers,
+                        include_symbols: this.options.include_symbols,
+                        exclude_ambiguous: this.options.exclude_ambiguous
+                    })
+                });
+
+                const data = await response.json();
+
+                if (data.success) {
+                    this.generatedPassword = data.password;
+                    this.strength = data.strength;
+
+                    // Add to history (max 5)
+                    this.history.unshift({
+                        password: data.password,
+                        strength: data.strength.strength
+                    });
+                    if (this.history.length > 5) {
+                        this.history.pop();
+                    }
+                } else {
+                    showToast(data.error || 'Failed to generate password', 'error');
+                }
+            } catch (error) {
+                console.error('Error generating password:', error);
+                showToast('Failed to generate password', 'error');
+            }
+        },
+
+        async copyPassword() {
+            if (!this.generatedPassword) return;
+            await this.copyToClipboard(this.generatedPassword);
+        },
+
+        async copyToClipboard(text) {
+            try {
+                await navigator.clipboard.writeText(text);
+                showToast('Password copied to clipboard!', 'success');
+            } catch (error) {
+                showToast('Failed to copy', 'error');
+            }
+        },
+
+        clearHistory() {
+            this.history = [];
+        }
+    };
+}
+</script>
+{% endblock %}

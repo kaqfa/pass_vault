@@ -21,7 +21,7 @@ from django.core.exceptions import PermissionDenied
 from django.db.models import Q, Count
 
 from apps.core.exceptions import ServiceError, ValidationError
-from apps.passwords.models import Password, PasswordHistory, PasswordAccessLog
+from apps.passwords.models import Password, PasswordHistory, PasswordAccessLog, PasswordShare
 from apps.passwords.validators import PasswordValidator, PasswordStrengthValidator
 from apps.groups.models import Group, UserGroup
 from apps.users.models import User
@@ -97,12 +97,7 @@ class PasswordService:
             plain_password = password_data.get('password', '')
             if not plain_password:
                 raise ValidationError({'password': 'Password is required'})
-            
-            # Validate password strength
-            strength_validator = PasswordStrengthValidator({'password': plain_password})
-            if not strength_validator.is_valid():
-                raise ValidationError(strength_validator.errors)
-            
+
             password.set_password(plain_password)
             password.save()
             
@@ -216,14 +211,9 @@ class PasswordService:
             # Update password if provided
             change_type = PasswordHistory.ChangeType.UPDATED
             if 'password' in password_data and password_data['password']:
-                # Validate password strength
-                strength_validator = PasswordStrengthValidator({'password': password_data['password']})
-                if not strength_validator.is_valid():
-                    raise ValidationError(strength_validator.errors)
-                
                 password.set_password(password_data['password'])
                 change_type = PasswordHistory.ChangeType.PASSWORD_CHANGED
-            
+
             password.save()
             
             # Create history entry
@@ -303,19 +293,82 @@ class PasswordService:
         except Exception as e:
             logger.error(f"Password deletion failed: {str(e)}")
             raise ServiceError(f"Failed to delete password: {str(e)}")
-    
+
     @staticmethod
-    def search_passwords(user: User, query: str, filters: Dict = None) -> List[Password]:
+    @transaction.atomic
+    def move_password(user: User, password_id: str, directory_id: str = None) -> Password:
+        """
+        Move password to a different directory.
+
+        Args:
+            user (User): User moving the password
+            password_id (str): Password ID
+            directory_id (str): Target directory ID (None to remove from directory)
+
+        Returns:
+            Password: Updated password instance
+
+        Raises:
+            ValidationError: If directory is invalid
+            PermissionDenied: If user doesn't have permission
+            ServiceError: If move fails
+        """
+        try:
+            password = Password.objects.get(id=password_id)
+
+            # Check permissions
+            if not PasswordService._can_user_edit_password(user, password):
+                raise PermissionDenied("You don't have permission to move this password")
+
+            # Get directory if specified
+            directory = None
+            if directory_id:
+                from apps.directories.models import Directory
+                try:
+                    directory = Directory.objects.get(id=directory_id)
+                    # Verify directory belongs to the same group
+                    if directory.group != password.group:
+                        raise ValidationError("Directory must belong to the same group as the password")
+                except Directory.DoesNotExist:
+                    raise ValidationError("Directory not found")
+
+            # Update password directory
+            old_directory = password.directory
+            password.directory = directory
+            password.save()
+
+            # Create history entry
+            PasswordHistory.objects.create(
+                password=password,
+                change_type=PasswordHistory.ChangeType.UPDATED,
+                changed_by=user,
+                previous_values={'old_directory': str(old_directory.id) if old_directory else None},
+                change_summary=f"Password '{password.title}' moved to '{directory.name if directory else 'Root'}'"
+            )
+
+            logger.info(f"Password moved: {password.title} to {directory.name if directory else 'Root'} by {user.email}")
+            return password
+
+        except Password.DoesNotExist:
+            raise ServiceError("Password not found")
+        except (ValidationError, PermissionDenied):
+            raise
+        except Exception as e:
+            logger.error(f"Password move failed: {str(e)}")
+            raise ServiceError(f"Failed to move password: {str(e)}")
+
+    @staticmethod
+    def search_passwords(user: User, query: str, filters: Dict = None):
         """
         Search passwords for user.
-        
+
         Args:
             user (User): User performing search
             query (str): Search query
             filters (Dict): Additional filters
-            
+
         Returns:
-            List[Password]: List of matching passwords
+            QuerySet: QuerySet of matching passwords
         """
         try:
             # Get user's accessible groups
@@ -344,7 +397,10 @@ class PasswordService:
                 
                 if 'is_favorite' in filters:
                     queryset = queryset.filter(is_favorite=filters['is_favorite'])
-                
+
+                if 'tags__contains' in filters:
+                    queryset = queryset.filter(tags__icontains=filters['tags__contains'])
+
                 if 'tags' in filters:
                     for tag in filters['tags']:
                         queryset = queryset.filter(tags__icontains=tag)
@@ -354,38 +410,36 @@ class PasswordService:
                     soon = timezone.now() + timedelta(days=30)
                     queryset = queryset.filter(expires_at__lte=soon, expires_at__isnull=False)
             
-            return list(queryset.select_related('group', 'created_by'))
-            
+            return queryset.select_related('group', 'created_by')
+
         except Exception as e:
             logger.error(f"Password search failed: {str(e)}")
             raise ServiceError(f"Search failed: {str(e)}")
     
     @staticmethod
-    def get_user_passwords(user: User, group_id: str = None) -> List[Password]:
+    def get_user_passwords(user: User, group_id: str = None):
         """
         Get passwords accessible to user.
-        
+
         Args:
             user (User): User requesting passwords
             group_id (str): Optional group filter
-            
+
         Returns:
-            List[Password]: List of accessible passwords
+            QuerySet: QuerySet of accessible passwords
         """
         try:
             # Get user's accessible groups
             user_groups = PasswordService._get_user_accessible_groups(user)
-            
+
             # Filter by specific group if provided
             if group_id:
                 user_groups = user_groups.filter(id=group_id)
-            
-            # Get passwords
-            passwords = Password.objects.filter(
+
+            # Get passwords - return queryset for further filtering
+            return Password.objects.filter(
                 group__in=user_groups
-            ).select_related('group', 'created_by').order_by('-updated_at')
-            
-            return list(passwords)
+            ).select_related('group', 'created_by')
             
         except Exception as e:
             logger.error(f"Get user passwords failed: {str(e)}")
@@ -447,6 +501,27 @@ class PasswordService:
         """Check if user can delete password."""
         # Same permissions as edit
         return PasswordService._can_user_edit_password(user, password)
+
+    @staticmethod
+    def _can_user_copy_password(user: User, password: Password) -> bool:
+        """Check if user can copy password."""
+        # Direct access (creator, group owner, member) allows copy
+        if PasswordService._can_user_view_password(user, password):
+            return True
+
+        # Check if user has copy or edit permission via share
+        share = PasswordShare.objects.filter(
+            password=password,
+            shared_with=user
+        ).first()
+
+        if share and not share.is_expired():
+            return share.permission in [
+                PasswordShare.Permission.COPY,
+                PasswordShare.Permission.EDIT
+            ]
+
+        return False
 
 
 class PasswordGeneratorService:
